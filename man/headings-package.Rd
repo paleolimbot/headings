@@ -8,6 +8,15 @@
 \description{
 Provides functions for manipulating compass headings.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://paleolimbot.github.io/headings/}
+  \item \url{https://github.com/paleolimbot/headings}
+  \item Report bugs at \url{https://github.com/paleolimbot/headings/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Dewey Dunnington \email{dewey.dunnington@dfo-mpo.gc.ca} (\href{https://orcid.org/0000-0002-9415-4582}{ORCID})
 
