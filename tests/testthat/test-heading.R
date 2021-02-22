@@ -59,6 +59,17 @@ test_that("mean and sd of hdgs works", {
   expect_identical(hdg_sd(c(1, 1, NA), na.rm = TRUE), 0)
 })
 
+test_that("weighted mean of headings works", {
+  expect_equal(
+    hdg_mean(0:5, weights = c(0, 0, 10, 0, 0, 0)),
+    2
+  )
+})
+
+test_that("weighted sd of headings works", {
+  expect_false(hdg_sd(0:5, weights = c(10, 0, 0, 0, 0, 10)) == hdg_sd(0:5))
+})
+
 test_that("sanitizers work", {
   expect_identical(as_uv(uv(1, 2)), uv(1, 2))
   expect_error(as_uv(1), "Can't convert")

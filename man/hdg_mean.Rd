@@ -6,17 +6,19 @@
 \alias{hdg_sd}
 \title{Heading arithmetic}
 \usage{
-hdg_mean(hdg, na.rm = FALSE)
+hdg_mean(hdg, weights = 1, na.rm = FALSE)
 
 hdg_diff(hdg, hdg_ref)
 
-hdg_sd(hdg, na.rm = FALSE)
+hdg_sd(hdg, weights = 1, na.rm = FALSE)
 }
 \arguments{
 \item{hdg}{A heading in degrees, where 0 is north,
 90 is east, 180 is south, and 270 is west. Values
 outside the range [0-360) are coerced to this range
 using \code{\link[=hdg_norm]{hdg_norm()}}.}
+
+\item{weights}{Optional weights for each value}
 
 \item{na.rm}{Use \code{TRUE} to remove missing values}
 

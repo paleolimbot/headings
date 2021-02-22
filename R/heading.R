@@ -84,6 +84,7 @@ hdg_from_rad <- function(rad) {
 #' @param hdg_ref A reference heading against which
 #'   to compare `hdg`.
 #' @param na.rm Use `TRUE` to remove missing values
+#' @param weights Optional weights for each value
 #'
 #' @export
 #'
@@ -93,14 +94,20 @@ hdg_from_rad <- function(rad) {
 #'
 #' hdg_diff(350:370, 0)
 #'
-hdg_mean <- function(hdg, na.rm = FALSE) {
+hdg_mean <- function(hdg, weights = 1, na.rm = FALSE) {
   hdg <- as_hdg(hdg)
+  recycled <- vctrs::vec_recycle_common(hdg, weights)
 
   if (na.rm) {
-    hdg <- hdg[!is.na(hdg)]
+    is_na <- is.na(recycled[[1]]) | is.na(recycled[[2]])
+    hdg <- recycled[[1]][!is_na]
+    weights <- recycled[[2]][!is_na]
+  } else {
+    hdg <- recycled[[1]]
+    weights <- recycled[[2]]
   }
 
-  uv <- uv_from_hdg(hdg)
+  uv <- uv_from_hdg(hdg) * weights
   hdg_from_uv(tibble::as_tibble(lapply(uv, sum)))
 }
 
@@ -127,24 +134,40 @@ hdg_diff <- function(hdg, hdg_ref) {
 
 #' @rdname hdg_mean
 #' @export
-hdg_sd <- function(hdg, na.rm = FALSE) {
+hdg_sd <- function(hdg, weights = 1, na.rm = FALSE) {
   hdg <- as_hdg(hdg)
+  recycled <- vctrs::vec_recycle_common(hdg, weights)
 
   if (na.rm) {
-    hdg <- hdg[!is.na(hdg)]
+    is_na <- is.na(recycled[[1]]) | is.na(recycled[[2]])
+    hdg <- recycled[[1]][!is_na]
+    weights <- recycled[[2]][!is_na]
+  } else {
+    hdg <- recycled[[1]]
+    weights <- recycled[[2]]
   }
 
+  # must be a unit vector
   uv <- uv_from_hdg(hdg)
 
+  # similarly, weights must be 0...1
+  weights <- weights / max(weights, na.rm = na.rm)
+
   # need the mean as a unit vector
-  uv_mean <- uv_norm(tibble::as_tibble(lapply(uv, sum)))
+  uv_mean <- uv_norm(tibble::as_tibble(lapply(uv * weights, sum)))
 
   # ...to get the chord lengths
   uv_chord <- Map("-", uv, uv_mean)
   chord_len <- sqrt(uv_chord$u ^ 2 + uv_chord$v ^ 2)
   angle_chord <- 2 * asin(chord_len / 2) * 180 / pi
 
-  sqrt(sum(angle_chord ^ 2) / (length(hdg) - 1))
+  n_non_zero_weights <- sum(weights != 0)
+
+  # scale angle_chord ^ 2 according to weights
+  sqrt(
+    sum(weights * (angle_chord ^ 2)) /
+      (((n_non_zero_weights - 1) * sum(weights)) / n_non_zero_weights)
+  )
 }
 
 # internal for sanitizing

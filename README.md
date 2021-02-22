@@ -64,23 +64,23 @@ kam <- weathercan::weather_dl(
 kam %>% 
   group_by(month) %>% 
   summarise(
-    mean(wind_dir, na.rm = TRUE),
-    sd(wind_dir, na.rm = TRUE)
+    mean_wtd = hdg_mean(wind_dir, weights = wind_spd, na.rm = TRUE),
+    sd_wtd = hdg_sd(wind_dir, weights = wind_spd, na.rm = TRUE)
   )
 #> `summarise()` ungrouping output (override with `.groups` argument)
 #> # A tibble: 12 x 3
-#>    month `mean(wind_dir, na.rm = TRUE)` `sd(wind_dir, na.rm = TRUE)`
-#>    <chr>                          <dbl>                        <dbl>
-#>  1 01                              17.0                        10.6 
-#>  2 02                              14.6                         8.88
-#>  3 03                              16.3                         9.43
-#>  4 04                              19.1                        10.1 
-#>  5 05                              20.3                         9.73
-#>  6 06                              17.8                         9.66
-#>  7 07                              19.5                         9.38
-#>  8 08                              21.5                         9.10
-#>  9 09                              19.2                        10.6 
-#> 10 10                              15.7                         9.49
-#> 11 11                              13.1                         8.19
-#> 12 12                              18.9                        11.2
+#>    month mean_wtd sd_wtd
+#>    <chr>    <dbl>  <dbl>
+#>  1 01        13.5   7.80
+#>  2 02        11.9   6.04
+#>  3 03        15.0   8.09
+#>  4 04        18.1   9.01
+#>  5 05        20.5   8.87
+#>  6 06        16.8   8.38
+#>  7 07        18.4   8.72
+#>  8 08        21.8   8.29
+#>  9 09        18.6   9.47
+#> 10 10        13.7   7.52
+#> 11 11        11.0   5.25
+#> 12 12        17.5   9.60
 ```

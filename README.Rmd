@@ -65,7 +65,7 @@ kam <- weathercan::weather_dl(
 kam %>% 
   group_by(month) %>% 
   summarise(
-    mean(wind_dir, na.rm = TRUE),
-    sd(wind_dir, na.rm = TRUE)
+    mean_wtd = hdg_mean(wind_dir, weights = wind_spd, na.rm = TRUE),
+    sd_wtd = hdg_sd(wind_dir, weights = wind_spd, na.rm = TRUE)
   )
 ```
