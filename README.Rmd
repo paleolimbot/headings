@@ -1,0 +1,68 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+library(tidyverse)
+library(weathercan)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# headings
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of headings is to ...
+
+## Installation
+
+You can install the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("paleolimbot/headings")
+```
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(headings)
+
+# totally bogus since 0 and 360 are identical!
+mean(c(350, 355, 360, 0, 5, 10))
+sd(c(350, 355, 360, 0, 5, 10))
+
+# everybody wins!
+hdg_mean(c(350, 355, 360, 0, 5, 10))
+hdg_sd(c(350, 355, 360, 0, 5, 10))
+```
+
+Practically, heading arithmetic can be used to summarize climate and/or current directions over time.
+
+```{r}
+library(tidyverse)
+library(weathercan)
+
+# get some climate data
+kam <- weathercan::weather_dl(
+  station_ids = 51423,
+  start = "2016-01-01",
+  end = "2016-12-31"
+)
+
+kam %>% 
+  group_by(month) %>% 
+  summarise(
+    mean(wind_dir, na.rm = TRUE),
+    sd(wind_dir, na.rm = TRUE)
+  )
+```
