@@ -1,38 +1,115 @@
 
-heading_normalize <- function(heading) {
-  (heading + 360) %% 360
-}
-
-uv_from_heading <- function(true_heading) {
-  tibble::tibble(
-    u = cos((90 - true_heading) * pi / 180),
-    v = sin((90 - true_heading) * pi / 180)
-  )
-}
-
-heading_from_uv <- function(uv) {
-  result <- ifelse(
-    uv$v >= 0,
-    atan(uv$u / uv$v) * 180 / pi,
-    180 + atan(uv$u / uv$v) * 180 / pi
-  )
-
-  (result + 360) %% 360
-}
-
-heading_mean <- function(true_heading, na.rm = FALSE) {
-  if (na.rm) {
-    true_heading <- true_heading[!is.na(true_heading)]
+#' Create and export headings
+#'
+#' @param hdg A heading in degrees, where 0 is north,
+#'   90 is east, 180 is south, and 270 is west. Values
+#'   outside the range [0-360) are coerced to this range
+#'   using [hdg_norm()].
+#' @param uv,u,v A data.frame with columns `u` (magnitude east)
+#'   and `v` (magnitude north).
+#' @param rad An angle in radians such that a `hdg` of 90 is
+#'   zero radians and a `hdg` of 0 is `pi / 2` radians.
+#'
+#' @export
+#'
+#' @examples
+#' hdg_norm(-10:10)
+#'
+hdg_norm <- function(hdg) {
+  hdg <- as_hdg(hdg)
+  while (any((hdg < 0 )| (hdg >= 360), na.rm = TRUE)) {
+    hdg <- (hdg + 360) %% 360
   }
 
-  uv <- uv_from_heading(true_heading)
-  heading_from_uv(lapply(uv, sum))
+  hdg
 }
 
-heading_diff <- function(h1, h2) {
-  common <- vctrs::vec_recycle_common(h1 = h1, h2 = h2)
-  uv1 <- uv_from_heading(common$h1)
-  uv2 <- uv_from_heading(common$h2)
+#' @rdname hdg_norm
+#' @export
+uv <- function(u, v) {
+  tibble::tibble(u = u, v = v)
+}
+
+#' @rdname hdg_norm
+#' @export
+uv_norm <- function(uv) {
+  uv <- as_uv(uv)
+
+  len <- sqrt(uv$u ^ 2 + uv$v ^ 2)
+  len[len < .Machine$double.eps] <- NA_real_
+
+  tibble::tibble(
+    u = uv$u / len,
+    v = uv$v / len
+  )
+}
+
+#' @rdname hdg_norm
+#' @export
+uv_from_hdg <- function(hdg) {
+  hdg <- as_hdg(hdg)
+
+  tibble::tibble(
+    u = cos((90 - hdg) * pi / 180),
+    v = sin((90 - hdg) * pi / 180)
+  )
+}
+
+#' @rdname hdg_norm
+#' @export
+hdg_from_uv <- function(uv) {
+  uv <- as_uv(uv)
+
+  radians <- atan2(uv$v, uv$u)
+  hdg_norm(90 - (radians * 180 / pi))
+}
+
+#' @rdname hdg_norm
+#' @export
+rad_from_hdg <- function(hdg) {
+  hdg <- as_hdg(hdg)
+  (90 - hdg) * pi / 180
+}
+
+#' @rdname hdg_norm
+#' @export
+hdg_from_rad <- function(rad) {
+  rad <- as_hdg(rad)
+  hdg_norm(90 - (rad * 180 / pi))
+}
+
+#' Heading arithmetic
+#'
+#' @inheritParams hdg_norm
+#' @param hdg_ref A reference heading against which
+#'   to compare `hdg`.
+#' @param na.rm Use `TRUE` to remove missing values
+#'
+#' @export
+#'
+#' @examples
+#' hdg_mean(-10:10)
+#' hdg_mean(c(350, 10))
+#'
+#' hdg_diff(350:370, 0)
+#'
+hdg_mean <- function(hdg, na.rm = FALSE) {
+  hdg <- as_hdg(hdg)
+
+  if (na.rm) {
+    hdg <- hdg[!is.na(hdg)]
+  }
+
+  uv <- uv_from_hdg(hdg)
+  hdg_from_uv(tibble::as_tibble(lapply(uv, sum)))
+}
+
+#' @rdname hdg_mean
+#' @export
+hdg_diff <- function(hdg, hdg_ref) {
+  common <- vctrs::vec_recycle_common(h1 = hdg, h2 = hdg_ref)
+  uv1 <- uv_from_hdg(common$h1)
+  uv2 <- uv_from_hdg(common$h2)
 
   # get the chord lengths
   uv_chord <- Map("-", uv1, uv2)
@@ -48,23 +125,33 @@ heading_diff <- function(h1, h2) {
   angle_chord * direction
 }
 
-heading_sd <- function(true_heading, na.rm = FALSE) {
+#' @rdname hdg_mean
+#' @export
+hdg_sd <- function(hdg, na.rm = FALSE) {
+  hdg <- as_hdg(hdg)
+
   if (na.rm) {
-    true_heading <- true_heading[!is.na(true_heading)]
+    hdg <- hdg[!is.na(hdg)]
   }
 
-  uv <- uv_from_heading(true_heading)
+  uv <- uv_from_hdg(hdg)
 
   # need the mean as a unit vector
-  uv_mean <- lapply(uv, sum)
-  uv_mean_len <- sqrt(uv_mean$u ^ 2 + uv_mean$v ^ 2)
-  uv_mean$u <- uv_mean$u / uv_mean_len
-  uv_mean$v <- uv_mean$v / uv_mean_len
+  uv_mean <- uv_norm(tibble::as_tibble(lapply(uv, sum)))
 
   # ...to get the chord lengths
   uv_chord <- Map("-", uv, uv_mean)
   chord_len <- sqrt(uv_chord$u ^ 2 + uv_chord$v ^ 2)
   angle_chord <- 2 * asin(chord_len / 2) * 180 / pi
 
-  sqrt(sum(angle_chord ^ 2) / (length(true_heading) - 1))
+  sqrt(sum(angle_chord ^ 2) / (length(hdg) - 1))
+}
+
+# internal for sanitizing
+as_uv <- function(uv) {
+  vctrs::vec_cast(uv, uv(double(), double()))
+}
+
+as_hdg <- function(hdg) {
+  vctrs::vec_cast(hdg, double())
 }
