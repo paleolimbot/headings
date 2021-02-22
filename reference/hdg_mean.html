@@ -117,11 +117,11 @@
     <p>Heading arithmetic</p>
     </div>
 
-    <pre class="usage"><span class='fu'>hdg_mean</span><span class='op'>(</span><span class='va'>hdg</span>, na.rm <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>hdg_mean</span><span class='op'>(</span><span class='va'>hdg</span>, weights <span class='op'>=</span> <span class='fl'>1</span>, na.rm <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='fu'>hdg_diff</span><span class='op'>(</span><span class='va'>hdg</span>, <span class='va'>hdg_ref</span><span class='op'>)</span>
 
-<span class='fu'>hdg_sd</span><span class='op'>(</span><span class='va'>hdg</span>, na.rm <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+<span class='fu'>hdg_sd</span><span class='op'>(</span><span class='va'>hdg</span>, weights <span class='op'>=</span> <span class='fl'>1</span>, na.rm <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -132,6 +132,10 @@
 90 is east, 180 is south, and 270 is west. Values
 outside the range [0-360) are coerced to this range
 using <code><a href='hdg_norm.html'>hdg_norm()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>weights</th>
+      <td><p>Optional weights for each value</p></td>
     </tr>
     <tr>
       <th>na.rm</th>
