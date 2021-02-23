@@ -297,38 +297,7 @@ int MAG_SetDefaults(MAGtype_Ellipsoid *Ellip, MAGtype_Geoid *Geoid);
 
 /*User Interface*/
 
-void MAG_Error(int control);
-
-int MAG_GetUserGrid(MAGtype_CoordGeodetic *minimum,
-        MAGtype_CoordGeodetic *maximum,
-        double *step_size,
-        double *a_step_size,
-        double *step_time,
-        MAGtype_Date *StartDate,
-        MAGtype_Date *EndDate,
-        int *ElementOption,
-        int *PrintOption,
-        char *OutputFile,
-        MAGtype_Geoid *Geoid);
-
-int MAG_GetUserInput(MAGtype_MagneticModel *MagneticModel,
-        MAGtype_Geoid *Geoid,
-        MAGtype_CoordGeodetic *CoordGeodetic,
-        MAGtype_Date *MagneticDate);
-
-void MAG_PrintGradient(MAGtype_Gradient Gradient);
-
-void MAG_PrintUserData(MAGtype_GeoMagneticElements GeomagElements,
-        MAGtype_CoordGeodetic SpaceInput,
-        MAGtype_Date TimeInput,
-        MAGtype_MagneticModel *MagneticModel,
-        MAGtype_Geoid *Geoid);
-
-
-
-int MAG_ValidateDMSstring(char *input, int min, int max, char *Error);
-
-int MAG_Warnings(int control, double value, MAGtype_MagneticModel *MagneticModel);
+const char* MAG_Error(int control);
 
 /*Memory and File Processing*/
 
@@ -349,12 +318,6 @@ int MAG_FreeLegendreMemory(MAGtype_LegendreFunction *LegendreFunction);
 int MAG_FreeMagneticModelMemory(MAGtype_MagneticModel *MagneticModel);
 
 int MAG_FreeSphVarMemory(MAGtype_SphericalHarmonicVariables *SphVar);
-
-void MAG_PrintWMMFormat(char *filename, MAGtype_MagneticModel *MagneticModel);
-
-void MAG_PrintEMMFormat(char *filename, char *filenameSV, MAGtype_MagneticModel *MagneticModel);
-
-void MAG_PrintSHDFFormat(char *filename, MAGtype_MagneticModel *(*MagneticModel)[], int epochs);
 
 int MAG_readMagneticModel(char *filename, MAGtype_MagneticModel *MagneticModel);
 
@@ -378,12 +341,6 @@ int MAG_CalculateGridVariation(MAGtype_CoordGeodetic location, MAGtype_GeoMagnet
 void MAG_CartesianToGeodetic(MAGtype_Ellipsoid Ellip, double x, double y, double z, MAGtype_CoordGeodetic *CoordGeodetic);
 
 MAGtype_CoordGeodetic MAG_CoordGeodeticAssign(MAGtype_CoordGeodetic CoordGeodetic);
-
-int MAG_DateToYear(MAGtype_Date *Calendar_Date, char *Error);
-
-void MAG_DegreeToDMSstring(double DegreesOfArc, int UnitDepth, char *DMSstring);
-
-void MAG_DMSstringToDegree(char *DMSstring, double *DegreesOfArc);
 
 void MAG_ErrorCalc(MAGtype_GeoMagneticElements B, MAGtype_GeoMagneticElements* Errors);
 
@@ -498,15 +455,6 @@ int MAG_GetGeoidHeight(double Latitude, double Longitude, double *DeltaHeight, M
 void MAG_EquivalentLatLon(double lat, double lon, double *repairedLat, double  *repairedLon);
 
 void MAG_WMMErrorCalc(double H, MAGtype_GeoMagneticElements *Uncertainty);
-void MAG_PrintUserDataWithUncertainty(MAGtype_GeoMagneticElements GeomagElements,
-        MAGtype_GeoMagneticElements Errors,
-        MAGtype_CoordGeodetic SpaceInput,
-        MAGtype_Date TimeInput,
-        MAGtype_MagneticModel *MagneticModel,
-        MAGtype_Geoid *Geoid);
-
-void MAG_GetDeg(char* Query_String, double* latitude, double bounds[2]);
-int MAG_GetAltitude(char* Query_String, MAGtype_Geoid *Geoid, MAGtype_CoordGeodetic* coords, int bounds[2], int AltitudeSetting);
 
 #ifdef __cplusplus
 }
