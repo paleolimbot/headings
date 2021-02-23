@@ -22,3 +22,6 @@ Imports:
     tibble
 URL: https://paleolimbot.github.io/headings/, https://github.com/paleolimbot/headings
 BugReports: https://github.com/paleolimbot/headings/issues
+LinkingTo: 
+    cpp11
+SystemRequirements: C++11
