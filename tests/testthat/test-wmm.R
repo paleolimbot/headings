@@ -20,6 +20,25 @@ test_that("wmm defaults work", {
   )
 })
 
+test_that("wmm_extract() warns for out-of-range year values", {
+  expect_warning(wmm_extract(0, 0, year = 2019), "must be between")
+  expect_warning(wmm_extract(0, 0, year = 2025.1), "must be between")
+})
+
+test_that("wmm_extract() can handle NA values", {
+  expect_true(is.na(wmm_extract(0, 0, year = 2020, height = NA)$decl))
+  expect_true(is.na(wmm_extract(0, 0, year = NA, height = 0)$decl))
+  expect_true(is.na(wmm_extract(0, NA, year = 2020, height = 0)$decl))
+  expect_true(is.na(wmm_extract(NA, 0, year = 2020, height = 0)$decl))
+})
+
+test_that("wmm_extract() warns for out-of-range lat/lon values", {
+  expect_warning(wmm_extract(-181, 0, year = 2020, height = 0), "must be between")
+  expect_warning(wmm_extract(181, 0, year = 2020, height = 0), "must be between")
+  expect_warning(wmm_extract(0, -91, year = 2020, height = 0), "must be between")
+  expect_warning(wmm_extract(0, 91, year = 2020, height = 0), "must be between")
+})
+
 test_that("wmm_version() works", {
   expect_match(wmm_version(), "2019-12-10")
 })
