@@ -4,7 +4,7 @@
 \name{headings-package}
 \alias{headings}
 \alias{headings-package}
-\title{headings: Tools for Working With Compass Headings}
+\title{headings: Tools for Working with Compass Headings}
 \description{
 Provides functions for manipulating compass headings.
 }

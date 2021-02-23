@@ -19,6 +19,13 @@ extern "C" SEXP _headings_cpp_wmm_read_coef(SEXP filename_utf8) {
   END_CPP11
 }
 // wmm.cpp
+doubles cpp_wmm_ellipsoidal_height(list coords, integers geoid_ints);
+extern "C" SEXP _headings_cpp_wmm_ellipsoidal_height(SEXP coords, SEXP geoid_ints) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(cpp_wmm_ellipsoidal_height(cpp11::as_cpp<cpp11::decay_t<list>>(coords), cpp11::as_cpp<cpp11::decay_t<integers>>(geoid_ints)));
+  END_CPP11
+}
+// wmm.cpp
 list cpp_wmm_extract(SEXP model_sexp, list coords);
 extern "C" SEXP _headings_cpp_wmm_extract(SEXP model_sexp, SEXP coords) {
   BEGIN_CPP11
@@ -28,14 +35,16 @@ extern "C" SEXP _headings_cpp_wmm_extract(SEXP model_sexp, SEXP coords) {
 
 extern "C" {
 /* .Call calls */
+extern SEXP _headings_cpp_wmm_ellipsoidal_height(SEXP, SEXP);
 extern SEXP _headings_cpp_wmm_extract(SEXP, SEXP);
 extern SEXP _headings_cpp_wmm_read_coef(SEXP);
 extern SEXP _headings_cpp_wmm_version();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_headings_cpp_wmm_extract",   (DL_FUNC) &_headings_cpp_wmm_extract,   2},
-    {"_headings_cpp_wmm_read_coef", (DL_FUNC) &_headings_cpp_wmm_read_coef, 1},
-    {"_headings_cpp_wmm_version",   (DL_FUNC) &_headings_cpp_wmm_version,   0},
+    {"_headings_cpp_wmm_ellipsoidal_height", (DL_FUNC) &_headings_cpp_wmm_ellipsoidal_height, 2},
+    {"_headings_cpp_wmm_extract",            (DL_FUNC) &_headings_cpp_wmm_extract,            2},
+    {"_headings_cpp_wmm_read_coef",          (DL_FUNC) &_headings_cpp_wmm_read_coef,          1},
+    {"_headings_cpp_wmm_version",            (DL_FUNC) &_headings_cpp_wmm_version,            0},
     {NULL, NULL, 0}
 };
 }

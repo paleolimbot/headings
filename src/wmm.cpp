@@ -3,6 +3,8 @@
 using namespace cpp11;
 namespace writable = cpp11::writable;
 
+#include <vector>
+
 #include "GeomagnetismHeader.h"
 
 class WMMMagneticModel {
@@ -57,6 +59,57 @@ SEXP cpp_wmm_read_coef(std::string filename_utf8) {
 }
 
 [[cpp11::register]]
+doubles cpp_wmm_ellipsoidal_height(list coords, integers geoid_ints) {
+    doubles lambda = coords["lambda"];
+    doubles phi = coords["phi"];
+    doubles height = coords["height"];
+
+    if (geoid_ints.size() != 1038961) {
+        stop("Expected `geoid` as an integer vector with length 1038961");
+    }
+
+    // geoid_ints are the float values scaled by 1000, but we need a float
+    // buffer
+    std::vector<float> geoid_floats(geoid_ints.size());
+    for (R_xlen_t i = 0; i < geoid_ints.size(); i++) {
+        geoid_floats[i] = geoid_ints[i] / 1000.0;
+    }
+
+    MAGtype_Ellipsoid ellipsoid;
+    MAGtype_Geoid geoid;
+    MAG_SetDefaults(&ellipsoid, &geoid);
+    // double make sure the geoid *is* getting used here
+    geoid.UseGeoid = 1;
+
+    geoid.GeoidHeightBuffer = geoid_floats.data();
+    geoid.Geoid_Initialized = 1;
+
+    R_xlen_t size = lambda.size();
+    writable::doubles height_ellipsoid(size);
+    MAGtype_CoordGeodetic coord_geod;
+    coord_geod.UseGeoid = 1;
+
+    for (R_xlen_t i = 0; i < size; i++) {
+        coord_geod.lambda = lambda[i];
+        coord_geod.phi = phi[i];
+        coord_geod.HeightAboveGeoid = height[i];
+
+        // MAG_ConvertGeoidToEllipsoidHeight() crashes with NAs
+        if (is_na(coord_geod.lambda) || 
+              is_na(coord_geod.phi) || 
+              is_na(coord_geod.HeightAboveGeoid)) {
+            height_ellipsoid[i] = NA_REAL;
+            continue;
+        }
+
+        MAG_ConvertGeoidToEllipsoidHeight(&coord_geod, &geoid);
+        height_ellipsoid[i] = coord_geod.HeightAboveEllipsoid;
+    }
+
+    return height_ellipsoid;
+}
+
+[[cpp11::register]]
 list cpp_wmm_extract(SEXP model_sexp, list coords) {
     external_pointer<WMMMagneticModel> model = model_sexp;
 
@@ -81,11 +134,15 @@ list cpp_wmm_extract(SEXP model_sexp, list coords) {
     MAGtype_Ellipsoid ellipsoid;
     MAGtype_CoordSpherical coord_spherical;
     MAGtype_CoordGeodetic coord_geod;
+    coord_geod.HeightAboveGeoid = NA_REAL;
+    coord_geod.UseGeoid = 0;
     MAGtype_Date user_date;
     MAGtype_GeoMagneticElements elements, element_errors;
     MAGtype_Geoid geoid;
 
     MAG_SetDefaults(&ellipsoid, &geoid);
+    // double make sure the geoid isn't getting used here
+    geoid.UseGeoid = 0;
 
     for (R_xlen_t i = 0 ; i < size; i++) {
         coord_geod.lambda = lambda[i];

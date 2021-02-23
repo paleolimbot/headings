@@ -8,6 +8,10 @@ cpp_wmm_read_coef <- function(filename_utf8) {
   .Call(`_headings_cpp_wmm_read_coef`, filename_utf8)
 }
 
+cpp_wmm_ellipsoidal_height <- function(coords, geoid_ints) {
+  .Call(`_headings_cpp_wmm_ellipsoidal_height`, coords, geoid_ints)
+}
+
 cpp_wmm_extract <- function(model_sexp, coords) {
   .Call(`_headings_cpp_wmm_extract`, model_sexp, coords)
 }
