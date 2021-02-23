@@ -4,28 +4,28 @@
 
 #include "cpp11/declarations.hpp"
 
-// wmm.cpp
+// wmm-emm.cpp
 std::string cpp_wmm_version();
 extern "C" SEXP _headings_cpp_wmm_version() {
   BEGIN_CPP11
     return cpp11::as_sexp(cpp_wmm_version());
   END_CPP11
 }
-// wmm.cpp
+// wmm-emm.cpp
 SEXP cpp_wmm_read_coef(std::string filename_utf8);
 extern "C" SEXP _headings_cpp_wmm_read_coef(SEXP filename_utf8) {
   BEGIN_CPP11
     return cpp11::as_sexp(cpp_wmm_read_coef(cpp11::as_cpp<cpp11::decay_t<std::string>>(filename_utf8)));
   END_CPP11
 }
-// wmm.cpp
+// wmm-emm.cpp
 doubles cpp_wmm_ellipsoidal_height(list coords, integers geoid_ints);
 extern "C" SEXP _headings_cpp_wmm_ellipsoidal_height(SEXP coords, SEXP geoid_ints) {
   BEGIN_CPP11
     return cpp11::as_sexp(cpp_wmm_ellipsoidal_height(cpp11::as_cpp<cpp11::decay_t<list>>(coords), cpp11::as_cpp<cpp11::decay_t<integers>>(geoid_ints)));
   END_CPP11
 }
-// wmm.cpp
+// wmm-emm.cpp
 list cpp_wmm_extract(SEXP model_sexp, list coords);
 extern "C" SEXP _headings_cpp_wmm_extract(SEXP model_sexp, SEXP coords) {
   BEGIN_CPP11
