@@ -36,4 +36,4 @@ wmm_egm9615_geoid_dbl <- float_values %>%
 # these are all fixed-precision at 3 decimal places, so store as int
 wmm_egm9615_geoid_int <- as.integer(wmm_egm9615_geoid_dbl * 1000)
 
-usethis::use_data(wmm_egm9615_geoid_int, overwrite = TRUE)
+usethis::use_data(mm_egm9615_geoid_int, overwrite = TRUE)

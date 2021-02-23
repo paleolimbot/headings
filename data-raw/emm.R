@@ -10,3 +10,8 @@ file.copy(
   "data-raw/EMM2017_Linux/EMM2017TestValues.txt",
   "inst/extdata"
 )
+
+file.copy(
+  list.files("data-raw/EMM2017_Linux", ".COF$", full.names = TRUE),
+  "inst/extdata"
+)

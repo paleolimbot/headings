@@ -34,12 +34,12 @@ private:
 
 
 [[cpp11::register]]
-std::string cpp_wmm_version() {
+std::string cpp_mm_version() {
     return VERSIONDATE_LARGE;
 }
 
 [[cpp11::register]]
-SEXP cpp_wmm_read_coef(std::string filename_utf8) {
+SEXP cpp_mm_read_coef(std::string filename_utf8) {
     // some peculiarities with the input...filename isn't modified and
     // the models array has a hard-to-replicate type
     MAGtype_MagneticModel *models_sane[1];
@@ -59,7 +59,7 @@ SEXP cpp_wmm_read_coef(std::string filename_utf8) {
 }
 
 [[cpp11::register]]
-doubles cpp_wmm_ellipsoidal_height(list coords, integers geoid_ints) {
+doubles cpp_mm_ellipsoidal_height(list coords, integers geoid_ints) {
     doubles lambda = coords["lambda"];
     doubles phi = coords["phi"];
     doubles height = coords["height"];
@@ -110,7 +110,7 @@ doubles cpp_wmm_ellipsoidal_height(list coords, integers geoid_ints) {
 }
 
 [[cpp11::register]]
-list cpp_wmm_extract(SEXP model_sexp, list coords) {
+list cpp_mm_extract(SEXP model_sexp, list coords) {
     external_pointer<WMMMagneticModel> model = model_sexp;
 
     doubles lambda = coords["lambda"];

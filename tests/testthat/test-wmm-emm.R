@@ -39,22 +39,22 @@ test_that("wmm_extract() warns for out-of-range lat/lon values", {
   expect_warning(wmm_extract(0, 91, year = 2020, height = 0), "must be between")
 })
 
-test_that("wmm_ellipsoidal_height() works", {
-  expect_true(abs(wmm_ellipsoidal_height(0, 0, 0) - 0) < 0.02)
+test_that("mm_ellipsoidal_height() works", {
+  expect_true(abs(mm_ellipsoidal_height(0, 0, 0) - 0) < 0.02)
   expect_equal(
-    wmm_ellipsoidal_height(0, 0, 10) - 10,
-    wmm_ellipsoidal_height(0, 0, 0) - 0
+    mm_ellipsoidal_height(0, 0, 10) - 10,
+    mm_ellipsoidal_height(0, 0, 0) - 0
   )
 
-  expect_warning(wmm_ellipsoidal_height(181, 0, height = 0), "must be between")
-  expect_warning(wmm_ellipsoidal_height(0, -91, height = 0), "must be between")
-  expect_true(is.na(wmm_ellipsoidal_height(0, NA, height = 0)))
-  expect_true(is.na(wmm_ellipsoidal_height(NA, 0, height = 0)))
-  expect_true(is.na(wmm_ellipsoidal_height(0, 0, height = NA)))
+  expect_warning(mm_ellipsoidal_height(181, 0, height = 0), "must be between")
+  expect_warning(mm_ellipsoidal_height(0, -91, height = 0), "must be between")
+  expect_true(is.na(mm_ellipsoidal_height(0, NA, height = 0)))
+  expect_true(is.na(mm_ellipsoidal_height(NA, 0, height = 0)))
+  expect_true(is.na(mm_ellipsoidal_height(0, 0, height = NA)))
 })
 
-test_that("wmm_version() works", {
-  expect_match(wmm_version(), "2019-12-10")
+test_that("mm_version() works", {
+  expect_match(mm_version(), "2019-12-10")
 })
 
 
