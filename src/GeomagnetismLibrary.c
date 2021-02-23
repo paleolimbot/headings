@@ -852,7 +852,9 @@ int MAG_readMagneticModel(char *filename, MAGtype_MagneticModel * MagneticModel)
     MagneticModel->Main_Field_Coeff_G[0] = 0.0;
     MagneticModel->Secular_Var_Coeff_H[0] = 0.0;
     MagneticModel->Secular_Var_Coeff_G[0] = 0.0;
-    fgets(c_str, 80, MAG_COF_File);
+    if (NULL == fgets(c_str, 80, MAG_COF_File)) {
+        return FALSE;
+    }
     sscanf(c_str, "%lf%s", &epoch, MagneticModel->ModelName);
     MagneticModel->epoch = epoch;
     while(EOF_Flag == 0)
