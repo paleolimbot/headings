@@ -41,14 +41,18 @@ wmm_extract <- function(lon, lat, year = wmm_decimal_year(Sys.Date()),
     coef <- wmm_read_coefficients(system.file("extdata/WMM.COF", package = "headings"))
   }
 
+  if (any(year > 2025.0, na.rm = TRUE) || any(year < 2020.0, na.rm = TRUE)) {
+    warning("`year` must be between 2020.0 and 2025.0", immediate. = TRUE)
+  }
+
+  mm_extract(lon, lat, year, height, coef)
+}
+
+mm_extract <- function(lon, lat, year, height, coef) {
   lon <- vctrs::vec_cast(lon, double())
   lat <- vctrs::vec_cast(lat, double())
   height <- vctrs::vec_cast(height, double())
   year <- vctrs::vec_cast(year, double())
-
-  if (any(year > 2025.0, na.rm = TRUE) || any(year < 2020.0, na.rm = TRUE)) {
-    warning("`year` must be between 2020.0 and 2025.0", immediate. = TRUE)
-  }
 
   if (any(lon > 180, na.rm = TRUE) || any(lon < -180, na.rm = TRUE)) {
     warning("`lon` must be between -180 and 180", immediate. = TRUE)
