@@ -37,7 +37,7 @@ std::string cpp_wmm_version() {
 }
 
 [[cpp11::register]]
-SEXP cpp_wmm_read_cof(std::string filename_utf8) {
+SEXP cpp_wmm_read_coef(std::string filename_utf8) {
     // some peculiarities with the input...filename isn't modified and
     // the models array has a hard-to-replicate type
     MAGtype_MagneticModel *models_sane[1];
@@ -57,7 +57,7 @@ SEXP cpp_wmm_read_cof(std::string filename_utf8) {
 }
 
 [[cpp11::register]]
-list cpp_wmm_extract(SEXP model_sexp, data_frame coords) {
+list cpp_wmm_extract(SEXP model_sexp, list coords) {
     external_pointer<WMMMagneticModel> model = model_sexp;
 
     doubles lambda = coords["lambda"];
@@ -72,7 +72,7 @@ list cpp_wmm_extract(SEXP model_sexp, data_frame coords) {
     int nMax = model->model()->nMax;
     WMMMagneticModel timed_model((nMax + 1) * (nMax + 2) / 2);
 
-    R_xlen_t size = coords.nrow();
+    R_xlen_t size = lambda.size();
     writable::doubles decl(size);
     writable::doubles incl(size);
     writable::doubles decl_err(size);

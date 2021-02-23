@@ -4,8 +4,8 @@ cpp_wmm_version <- function() {
   .Call(`_headings_cpp_wmm_version`)
 }
 
-cpp_wmm_read_cof <- function(filename_utf8) {
-  .Call(`_headings_cpp_wmm_read_cof`, filename_utf8)
+cpp_wmm_read_coef <- function(filename_utf8) {
+  .Call(`_headings_cpp_wmm_read_coef`, filename_utf8)
 }
 
 cpp_wmm_extract <- function(model_sexp, coords) {

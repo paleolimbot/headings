@@ -1,5 +1,5 @@
 Package: headings
-Title: Tools for Working With Compass Headings
+Title: Tools for Working with Compass Headings
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Dewey",

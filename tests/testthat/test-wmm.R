@@ -19,3 +19,9 @@ test_that("wmm defaults work", {
     test_values$V5
   )
 })
+
+test_that("wmm_version() works", {
+  expect_match(wmm_version(), "2019-12-10")
+})
+
+
