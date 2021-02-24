@@ -1,5 +1,5 @@
 
-#' NCEI World/Enhanced Magnetic Model Interface
+#' IGRF and NCEI World/Enhanced Magnetic Model Interface
 #'
 #' @param lon,lat Vectors of coordinates.
 #' @param year A decimal year (e.g., 2020.2120). The World Magnetic Model
@@ -21,6 +21,8 @@
 #'
 #' NCEI Enhanced Magnetic Model <https://www.ngdc.noaa.gov/geomag/EMM/index.html>.
 #'
+#' IGRF-13 <https://www.ngdc.noaa.gov/IAGA/vmod/home.html>.
+#'
 #' NCEI Geomagnetic Modeling Team and British Geological Survey.
 #' 2019. World Magnetic Model 2020. NOAA National Centers for Environmental
 #' Information. \doi{10.25921/11v3-da71}, 2020, accessed 2021-02-23.
@@ -31,10 +33,11 @@
 #' NOAA, \doi{10.25923/ytk1-yx35}, 2020.
 #'
 #' @examples
-#' wmm_extract(-64, 45, mm_decimal_year("2021-01-01"))
-#' emm_extract(-64, 45, mm_decimal_year("2021-01-01"))
+#' wmm2020_extract(-64, 45, mm_decimal_year("2021-01-01"))
+#' emm2017_extract(-64, 45, mm_decimal_year("2021-01-01"))
+#' igrf13_extract(-64, 45, mm_decimal_year("2021-01-01"))
 #'
-wmm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
+wmm2020_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                         height = mm_ellipsoidal_height(lon, lat, 0)) {
   lon <- vctrs::vec_cast(lon, double())
   lat <- vctrs::vec_cast(lat, double())
@@ -60,7 +63,63 @@ wmm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
 
 #' @rdname wmm_extract
 #' @export
-emm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
+igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
+                        height = mm_ellipsoidal_height(lon, lat, 0)) {
+  lon <- vctrs::vec_cast(lon, double())
+  lat <- vctrs::vec_cast(lat, double())
+  height <- vctrs::vec_cast(height, double())
+  year <- vctrs::vec_cast(year, double())
+
+  mm_check_lon_lat(lon, lat)
+
+  if (any(year < 1900.0, na.rm = TRUE) || any(year > 2025.0, na.rm = TRUE)) {
+    warning("`year` must be between 1900.0 and 2025.0", immediate. = TRUE)
+  }
+
+  coords <- tibble::tibble(
+    lambda = lon,
+    phi = lat,
+    height = height,
+    year = year
+  )
+
+  # different coef file for each 5-year period
+  year5 <- floor(coords$year / 5) * 5
+  coef_year <- as.integer(pmin(2020, pmax(1900, year5)))
+  coef_year_unique <- unique(coef_year)
+
+  output <- tibble::tibble(
+    decl = vctrs::vec_rep(NA_real_, length(coef_year)),
+    incl = vctrs::vec_rep(NA_real_, length(coef_year)),
+    decl_err = vctrs::vec_rep(NA_real_, length(coef_year)),
+    incl_err = vctrs::vec_rep(NA_real_, length(coef_year))
+  )
+
+  for (coef_year_val in setdiff(coef_year_unique, NA_real_)) {
+    coef <- igrf_coef_for_year(coef_year_val)
+    indices <- which(coef_year == coef_year_val)
+    output[indices, ] <- cpp_mm_extract(coef, coords[indices, ])
+  }
+
+  # no error model for IGRF, so NA these columns
+  output$decl_err <- NA_real_
+  output$incl_err <- NA_real_
+
+  output
+}
+
+igrf_coef_for_year <- function(coef_year) {
+  coef_file <- system.file(
+    paste0("extdata/IGRF13/", coef_year, ".COF"),
+    package = "headings"
+  )
+
+  cpp_mm_read_coef(coef_file)
+}
+
+#' @rdname wmm_extract
+#' @export
+emm2017_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                         height = mm_ellipsoidal_height(lon, lat, 0)) {
   lon <- vctrs::vec_cast(lon, double())
   lat <- vctrs::vec_cast(lat, double())
