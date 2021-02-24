@@ -39,6 +39,35 @@ test_that("wmm_extract() warns for out-of-range lat/lon values", {
   expect_warning(wmm_extract(0, 91, year = 2020, height = 0), "must be between")
 })
 
+test_that("emm_extract() defaults work", {
+  # taken from the test values distributed with EMM2017
+  test_values <- read.table(
+    system.file("extdata/EMM2017TestValues.txt", package = "headings"),
+    skip = 18,
+    header = FALSE
+  )
+
+  extract <- emm_extract(
+    lon = test_values$V4,
+    lat = test_values$V3,
+    year = test_values$V1,
+    height = test_values$V2
+  )
+
+  # 2017.0+
+  expect_identical(
+    tail(round(extract$decl, 2), 900),
+    tail(test_values$V5, 900)
+  )
+
+  # 2000.0 - 2016.9
+  expect_identical(
+    head(round(extract$decl, 2), 3060),
+    head(test_values$V5, 3060)
+  )
+})
+
+
 test_that("mm_ellipsoidal_height() works", {
   expect_true(abs(mm_ellipsoidal_height(0, 0, 0) - 0) < 0.02)
   expect_equal(

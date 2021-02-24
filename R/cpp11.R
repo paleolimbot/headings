@@ -8,6 +8,14 @@ cpp_mm_read_coef <- function(filename_utf8) {
   .Call(`_headings_cpp_mm_read_coef`, filename_utf8)
 }
 
+cpp_mm_read_coef_sv <- function(filename_utf8, filename_sv_utf8) {
+  .Call(`_headings_cpp_mm_read_coef_sv`, filename_utf8, filename_sv_utf8)
+}
+
+cpp_mm_coalesce_for_emm2017 <- function(mutable_model_sexp, model_sexp, zero_sv) {
+  invisible(.Call(`_headings_cpp_mm_coalesce_for_emm2017`, mutable_model_sexp, model_sexp, zero_sv))
+}
+
 cpp_mm_ellipsoidal_height <- function(coords, geoid_ints) {
   .Call(`_headings_cpp_mm_ellipsoidal_height`, coords, geoid_ints)
 }

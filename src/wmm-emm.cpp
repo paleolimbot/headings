@@ -59,6 +59,55 @@ SEXP cpp_mm_read_coef(std::string filename_utf8) {
 }
 
 [[cpp11::register]]
+SEXP cpp_mm_read_coef_sv(std::string filename_utf8, std::string filename_sv_utf8) {
+    MAGtype_MagneticModel *models_sane[1];
+    models_sane[0] = nullptr;
+
+    char* filename_buf = (char*) filename_utf8.c_str();
+    char* filename_sv_buf = (char*) filename_sv_utf8.c_str();
+
+    int result = MAG_robustReadMagneticModel_Large(filename_buf, filename_sv_buf, models_sane);
+    if (result == 0) {
+        if (models_sane[0] != nullptr) {
+            MAG_FreeMagneticModelMemory(models_sane[0]);
+        }
+        stop(
+            "Failed to open model coefficients from '%s' or '%s'", 
+            filename_utf8.c_str(),
+            filename_sv_utf8.c_str()
+        );
+    }
+
+    return external_pointer<WMMMagneticModel>(new WMMMagneticModel(models_sane[0]));
+}
+
+[[cpp11::register]]
+void cpp_mm_coalesce_for_emm2017(SEXP mutable_model_sexp, SEXP model_sexp, bool zero_sv) {
+    external_pointer<WMMMagneticModel> mutable_model = mutable_model_sexp;
+    external_pointer<WMMMagneticModel> model = model_sexp;
+
+    // make sure the model knows which epoch it is in
+    mutable_model->model()->epoch = model->model()->epoch;
+
+    // assign coefficients from the epoch model against the
+    // "main" model (2017)
+    MAG_AssignMagneticModelCoeffs(
+        mutable_model->model(), model->model(), 
+        model->model()->nMax, model->model()->nMaxSecVar
+    );
+
+    // For each set of coefficients that isn't the main model, some secular
+    // variation coefficients need to be zeroed out
+    if (zero_sv) {
+        for(int i = 0; i < 16; i++) {
+            int index = 16 * 17 / 2 + i;
+            mutable_model->model()->Secular_Var_Coeff_G[index] = 0;
+            mutable_model->model()->Secular_Var_Coeff_H[index] = 0;
+        }
+    }
+}
+
+[[cpp11::register]]
 doubles cpp_mm_ellipsoidal_height(list coords, integers geoid_ints) {
     doubles lambda = coords["lambda"];
     doubles phi = coords["phi"];

@@ -33,8 +33,6 @@
 #'
 wmm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                         height = mm_ellipsoidal_height(lon, lat, 0)) {
-  coef <- cpp_mm_read_coef(system.file("extdata/WMM.COF", package = "headings"))
-
   lon <- vctrs::vec_cast(lon, double())
   lat <- vctrs::vec_cast(lat, double())
   height <- vctrs::vec_cast(height, double())
@@ -53,8 +51,71 @@ wmm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
     year = year
   )
 
+  coef <- cpp_mm_read_coef(system.file("extdata/WMM.COF", package = "headings"))
   cpp_mm_extract(coef, coords)
 }
+
+#' @rdname wmm_extract
+#' @export
+emm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
+                        height = mm_ellipsoidal_height(lon, lat, 0)) {
+  lon <- vctrs::vec_cast(lon, double())
+  lat <- vctrs::vec_cast(lat, double())
+  height <- vctrs::vec_cast(height, double())
+  year <- vctrs::vec_cast(year, double())
+
+  mm_check_lon_lat(lon, lat)
+
+  if (any(year < 2000.0, na.rm = TRUE) || any(year > 2022.0, na.rm = TRUE)) {
+    warning("`year` must be between 2000.0 and 2022.0", immediate. = TRUE)
+  }
+
+  coords <- tibble::tibble(
+    lambda = lon,
+    phi = lat,
+    height = height,
+    year = year
+  )
+
+  coef_year <- as.integer(pmin(2017, pmax(2000, coords$year)))
+  coef_year_unique <- unique(coef_year)
+
+  output <- tibble::tibble(
+    decl = vctrs::vec_rep(NA_real_, length(coef_year)),
+    incl = vctrs::vec_rep(NA_real_, length(coef_year)),
+    decl_err = vctrs::vec_rep(NA_real_, length(coef_year)),
+    incl_err = vctrs::vec_rep(NA_real_, length(coef_year))
+  )
+
+  mutable_coef <- emm_coef_for_year(2017)
+
+  for (coef_year_val in setdiff(coef_year_unique, NA_real_)) {
+    coef <- emm_coef_for_year(coef_year_val)
+    cpp_mm_coalesce_for_emm2017(mutable_coef, coef, coef_year_val != 2017)
+
+    indices <- which(coef_year == coef_year_val)
+    message(sprintf("Extract %s", coef_year_val))
+    output[indices, ] <- cpp_mm_extract(coef, coords[indices, ])
+    message(sprintf("Done %s", coef_year_val))
+  }
+
+  output
+}
+
+emm_coef_for_year <- function(coef_year) {
+  coef_file <- system.file(
+    paste0("extdata/EMM", coef_year, ".COF"),
+    package = "headings"
+  )
+
+  coef_sv_file <- system.file(
+    paste0("extdata/EMM", coef_year, "SV.COF"),
+    package = "headings"
+  )
+
+  cpp_mm_read_coef_sv(coef_file, coef_sv_file)
+}
+
 
 #' @rdname wmm_extract
 #' @export
