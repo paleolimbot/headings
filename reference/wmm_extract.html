@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>NCEI World Magnetic Model 2020 — wmm_extract • headings</title>
+<title>NCEI World/Enhanced Magnetic Model Interface — wmm_extract • headings</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="NCEI World Magnetic Model 2020 — wmm_extract" />
-<meta property="og:description" content="NCEI World Magnetic Model 2020" />
+<meta property="og:title" content="NCEI World/Enhanced Magnetic Model Interface — wmm_extract" />
+<meta property="og:description" content="NCEI World/Enhanced Magnetic Model Interface" />
 
 
 
@@ -108,16 +108,23 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>NCEI World Magnetic Model 2020</h1>
+    <h1>NCEI World/Enhanced Magnetic Model Interface</h1>
     <small class="dont-index">Source: <a href='https://github.com/paleolimbot/headings/blob/master/R/wmm-emm.R'><code>R/wmm-emm.R</code></a></small>
     <div class="hidden name"><code>wmm_extract.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>NCEI World Magnetic Model 2020</p>
+    <p>NCEI World/Enhanced Magnetic Model Interface</p>
     </div>
 
     <pre class="usage"><span class='fu'>wmm_extract</span><span class='op'>(</span>
+  <span class='va'>lon</span>,
+  <span class='va'>lat</span>,
+  year <span class='op'>=</span> <span class='fu'>mm_decimal_year</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>,
+  height <span class='op'>=</span> <span class='fu'>mm_ellipsoidal_height</span><span class='op'>(</span><span class='va'>lon</span>, <span class='va'>lat</span>, <span class='fl'>0</span><span class='op'>)</span>
+<span class='op'>)</span>
+
+<span class='fu'>emm_extract</span><span class='op'>(</span>
   <span class='va'>lon</span>,
   <span class='va'>lat</span>,
   year <span class='op'>=</span> <span class='fu'>mm_decimal_year</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>,
@@ -142,7 +149,8 @@
     <tr>
       <th>year</th>
       <td><p>A decimal year (e.g., 2020.2120). The World Magnetic Model
-is valid between 2020.0 and 2025.0</p></td>
+is valid between 2020.0 and 2025.0; the Enhanced Magnetic Model
+is valid between 2000.0 and 2022.0.</p></td>
     </tr>
     <tr>
       <th>height</th>
@@ -168,6 +176,7 @@ respectively.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>NCEI World Magnetic Model <a href='https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml'>https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml</a>.</p>
+<p>NCEI Enhanced Magnetic Model <a href='https://www.ngdc.noaa.gov/geomag/EMM/index.html'>https://www.ngdc.noaa.gov/geomag/EMM/index.html</a>.</p>
 <p>NCEI Geomagnetic Modeling Team and British Geological Survey.
 2019. World Magnetic Model 2020. NOAA National Centers for Environmental
 Information. doi: <a href='https://doi.org/10.25921/11v3-da71'>10.25921/11v3-da71</a>
@@ -179,21 +188,16 @@ NOAA, doi: <a href='https://doi.org/10.25923/ytk1-yx35'>10.25923/ytk1-yx35</a>
 , 2020.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>mm_version</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "$Date: 2019-12-10 10:40:43 -0700 (Tue, 10 Dec 2019) $"</div><div class='input'><span class='fu'>wmm_extract</span><span class='op'>(</span><span class='op'>-</span><span class='fl'>64</span>, <span class='fl'>45</span>, <span class='fu'>mm_decimal_year</span><span class='op'>(</span><span class='st'>"2021-01-01"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $decl
-#&gt; [1] -16.89051
-#&gt; 
-#&gt; $incl
-#&gt; [1] 67.16415
-#&gt; 
-#&gt; $decl_err
-#&gt; [1] 0.21
-#&gt; 
-#&gt; $incl_err
-#&gt; [1] 6.946301e-310
-#&gt; </div><div class='input'>
-</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>wmm_extract</span><span class='op'>(</span><span class='op'>-</span><span class='fl'>64</span>, <span class='fl'>45</span>, <span class='fu'>mm_decimal_year</span><span class='op'>(</span><span class='st'>"2021-01-01"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 1 x 4</span><span>
+#&gt;    decl  incl decl_err  incl_err
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> -</span><span style='color: #BB0000;'>16.9</span><span>  67.2     0.21 6.93</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-310</span><span></div><div class='input'><span class='fu'>emm_extract</span><span class='op'>(</span><span class='op'>-</span><span class='fl'>64</span>, <span class='fl'>45</span>, <span class='fu'>mm_decimal_year</span><span class='op'>(</span><span class='st'>"2021-01-01"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 1 x 4</span><span>
+#&gt;    decl  incl decl_err incl_err
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> -</span><span style='color: #BB0000;'>16.7</span><span>  66.9       </span><span style='color: #BB0000;'>NA</span><span>       </span><span style='color: #BB0000;'>NA</span><span></div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
