@@ -60,6 +60,24 @@ test_that("emm_extract() defaults work", {
   )
 })
 
+test_that("emm_extract() warns for out-of-range year values", {
+  expect_warning(emm_extract(0, 0, year = 1999.9), "must be between")
+  expect_warning(emm_extract(0, 0, year = 2022.1), "must be between")
+})
+
+test_that("wmm_extract() can handle NA values", {
+  expect_true(is.na(emm_extract(0, 0, year = 2020, height = NA)$decl))
+  expect_true(is.na(emm_extract(0, 0, year = NA, height = 0)$decl))
+  expect_true(is.na(emm_extract(0, NA, year = 2020, height = 0)$decl))
+  expect_true(is.na(emm_extract(NA, 0, year = 2020, height = 0)$decl))
+})
+
+test_that("emm_extract() warns for out-of-range lat/lon values", {
+  expect_warning(emm_extract(-181, 0, year = 2020, height = 0), "must be between")
+  expect_warning(emm_extract(181, 0, year = 2020, height = 0), "must be between")
+  expect_warning(emm_extract(0, -91, year = 2020, height = 0), "must be between")
+  expect_warning(emm_extract(0, 91, year = 2020, height = 0), "must be between")
+})
 
 test_that("mm_ellipsoidal_height() works", {
   expect_true(abs(mm_ellipsoidal_height(0, 0, 0) - 0) < 0.02)

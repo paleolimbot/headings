@@ -1,9 +1,10 @@
 
-#' NCEI World Magnetic Model 2020
+#' NCEI World/Enhanced Magnetic Model Interface
 #'
 #' @param lon,lat Vectors of coordinates.
 #' @param year A decimal year (e.g., 2020.2120). The World Magnetic Model
-#'   is valid between 2020.0 and 2025.0
+#'   is valid between 2020.0 and 2025.0; the Enhanced Magnetic Model
+#'   is valid between 2000.0 and 2022.0.
 #' @param date An R date object or value that can be coerced to one.
 #' @param height Height above the WGS84 ellipsoid in kilometers. Use
 #'   [mm_ellipsoidal_height()] to convert geoid elevations (EGM9615)
@@ -18,6 +19,8 @@
 #' @references
 #' NCEI World Magnetic Model <https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml>.
 #'
+#' NCEI Enhanced Magnetic Model <https://www.ngdc.noaa.gov/geomag/EMM/index.html>.
+#'
 #' NCEI Geomagnetic Modeling Team and British Geological Survey.
 #' 2019. World Magnetic Model 2020. NOAA National Centers for Environmental
 #' Information. \doi{10.25921/11v3-da71}, 2020, accessed 2021-02-23.
@@ -28,8 +31,8 @@
 #' NOAA, \doi{10.25923/ytk1-yx35}, 2020.
 #'
 #' @examples
-#' mm_version()
 #' wmm_extract(-64, 45, mm_decimal_year("2021-01-01"))
+#' emm_extract(-64, 45, mm_decimal_year("2021-01-01"))
 #'
 wmm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                         height = mm_ellipsoidal_height(lon, lat, 0)) {
@@ -52,7 +55,7 @@ wmm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
   )
 
   coef <- cpp_mm_read_coef(system.file("extdata/WMM.COF", package = "headings"))
-  cpp_mm_extract(coef, coords)
+  tibble::as_tibble(cpp_mm_extract(coef, coords))
 }
 
 #' @rdname wmm_extract
@@ -96,6 +99,10 @@ emm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
     indices <- which(coef_year == coef_year_val)
     output[indices, ] <- cpp_mm_extract(mutable_coef, coords[indices, ])
   }
+
+  # no error model for EMM, so NA these columns
+  output$decl_err <- NA_real_
+  output$incl_err <- NA_real_
 
   output
 }

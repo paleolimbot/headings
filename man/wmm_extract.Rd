@@ -3,16 +3,24 @@
 \docType{data}
 \name{wmm_extract}
 \alias{wmm_extract}
+\alias{emm_extract}
 \alias{mm_ellipsoidal_height}
 \alias{mm_decimal_year}
 \alias{mm_version}
 \alias{mm_egm9615_geoid_int}
-\title{NCEI World Magnetic Model 2020}
+\title{NCEI World/Enhanced Magnetic Model Interface}
 \format{
 An object of class \code{integer} of length 1038961.
 }
 \usage{
 wmm_extract(
+  lon,
+  lat,
+  year = mm_decimal_year(Sys.Date()),
+  height = mm_ellipsoidal_height(lon, lat, 0)
+)
+
+emm_extract(
   lon,
   lat,
   year = mm_decimal_year(Sys.Date()),
@@ -31,7 +39,8 @@ mm_egm9615_geoid_int
 \item{lon, lat}{Vectors of coordinates.}
 
 \item{year}{A decimal year (e.g., 2020.2120). The World Magnetic Model
-is valid between 2020.0 and 2025.0}
+is valid between 2020.0 and 2025.0; the Enhanced Magnetic Model
+is valid between 2000.0 and 2022.0.}
 
 \item{height}{Height above the WGS84 ellipsoid in kilometers. Use
 \code{\link[=mm_ellipsoidal_height]{mm_ellipsoidal_height()}} to convert geoid elevations (EGM9615)
@@ -46,15 +55,17 @@ A data frame with columns - \code{decl}: Magnetic variation in degrees -
 respectively.
 }
 \description{
-NCEI World Magnetic Model 2020
+NCEI World/Enhanced Magnetic Model Interface
 }
 \examples{
-mm_version()
 wmm_extract(-64, 45, mm_decimal_year("2021-01-01"))
+emm_extract(-64, 45, mm_decimal_year("2021-01-01"))
 
 }
 \references{
 NCEI World Magnetic Model \url{https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml}.
+
+NCEI Enhanced Magnetic Model \url{https://www.ngdc.noaa.gov/geomag/EMM/index.html}.
 
 NCEI Geomagnetic Modeling Team and British Geological Survey.
 2019. World Magnetic Model 2020. NOAA National Centers for Environmental
