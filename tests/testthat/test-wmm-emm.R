@@ -54,16 +54,9 @@ test_that("emm_extract() defaults work", {
     height = test_values$V2
   )
 
-  # 2017.0+
   expect_identical(
-    tail(round(extract$decl, 2), 900),
-    tail(test_values$V5, 900)
-  )
-
-  # 2000.0 - 2016.9
-  expect_identical(
-    head(round(extract$decl, 2), 3060),
-    head(test_values$V5, 3060)
+    round(extract$decl, 2),
+    test_values$V5
   )
 })
 

@@ -94,9 +94,7 @@ emm_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
     cpp_mm_coalesce_for_emm2017(mutable_coef, coef, coef_year_val != 2017)
 
     indices <- which(coef_year == coef_year_val)
-    message(sprintf("Extract %s", coef_year_val))
-    output[indices, ] <- cpp_mm_extract(coef, coords[indices, ])
-    message(sprintf("Done %s", coef_year_val))
+    output[indices, ] <- cpp_mm_extract(mutable_coef, coords[indices, ])
   }
 
   output

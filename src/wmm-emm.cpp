@@ -89,8 +89,7 @@ void cpp_mm_coalesce_for_emm2017(SEXP mutable_model_sexp, SEXP model_sexp, bool 
     // make sure the model knows which epoch it is in
     mutable_model->model()->epoch = model->model()->epoch;
 
-    // assign coefficients from the epoch model against the
-    // "main" model (2017)
+    // assign coefficients from the epoch model against the "main" model (2017)
     MAG_AssignMagneticModelCoeffs(
         mutable_model->model(), model->model(), 
         model->model()->nMax, model->model()->nMaxSecVar
@@ -194,6 +193,11 @@ list cpp_mm_extract(SEXP model_sexp, list coords) {
     geoid.UseGeoid = 0;
 
     for (R_xlen_t i = 0 ; i < size; i++) {
+        // for EMM this calculation is very slow, so check frequently
+        if (((i + 1) % 10) == 0) {
+            check_user_interrupt();
+        }
+
         coord_geod.lambda = lambda[i];
         coord_geod.phi = phi[i];
         coord_geod.HeightAboveEllipsoid = height[i];
