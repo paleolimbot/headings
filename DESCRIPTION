@@ -17,9 +17,6 @@ Suggests:
     testthat (>= 3.0.0),
     covr
 Config/testthat/edition: 3
-Imports: 
-    vctrs,
-    tibble
 URL: https://paleolimbot.github.io/headings/, https://github.com/paleolimbot/headings
 BugReports: https://github.com/paleolimbot/headings/issues
 LinkingTo: 

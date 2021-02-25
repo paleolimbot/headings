@@ -27,7 +27,7 @@ hdg_norm <- function(hdg) {
 #' @rdname hdg_norm
 #' @export
 uv <- function(u, v) {
-  tibble::tibble(u = u, v = v)
+  new_data_frame(recycle_common(u = cast_double(u), v = cast_double(v)))
 }
 
 #' @rdname hdg_norm
@@ -38,10 +38,7 @@ uv_norm <- function(uv) {
   len <- sqrt(uv$u ^ 2 + uv$v ^ 2)
   len[len < .Machine$double.eps] <- NA_real_
 
-  tibble::tibble(
-    u = uv$u / len,
-    v = uv$v / len
-  )
+  uv(uv$u / len, uv$v / len)
 }
 
 #' @rdname hdg_norm
@@ -49,9 +46,9 @@ uv_norm <- function(uv) {
 uv_from_hdg <- function(hdg) {
   hdg <- as_hdg(hdg)
 
-  tibble::tibble(
-    u = cos((90 - hdg) * pi / 180),
-    v = sin((90 - hdg) * pi / 180)
+  uv(
+    cos((90 - hdg) * pi / 180),
+    sin((90 - hdg) * pi / 180)
   )
 }
 
@@ -96,7 +93,7 @@ hdg_from_rad <- function(rad) {
 #'
 hdg_mean <- function(hdg, weights = 1, na.rm = FALSE) {
   hdg <- as_hdg(hdg)
-  recycled <- vctrs::vec_recycle_common(hdg, weights)
+  recycled <- recycle_common(hdg, weights)
 
   if (na.rm) {
     is_na <- is.na(recycled[[1]]) | is.na(recycled[[2]])
@@ -108,13 +105,13 @@ hdg_mean <- function(hdg, weights = 1, na.rm = FALSE) {
   }
 
   uv <- uv_from_hdg(hdg) * weights
-  hdg_from_uv(tibble::as_tibble(lapply(uv, sum)))
+  hdg_from_uv(lapply(uv, sum))
 }
 
 #' @rdname hdg_mean
 #' @export
 hdg_diff <- function(hdg, hdg_ref) {
-  common <- vctrs::vec_recycle_common(h1 = hdg, h2 = hdg_ref)
+  common <- recycle_common(h1 = hdg, h2 = hdg_ref)
   uv1 <- uv_from_hdg(common$h1)
   uv2 <- uv_from_hdg(common$h2)
 
@@ -136,7 +133,7 @@ hdg_diff <- function(hdg, hdg_ref) {
 #' @export
 hdg_sd <- function(hdg, weights = 1, na.rm = FALSE) {
   hdg <- as_hdg(hdg)
-  recycled <- vctrs::vec_recycle_common(hdg, weights)
+  recycled <- recycle_common(hdg, weights)
 
   if (na.rm) {
     is_na <- is.na(recycled[[1]]) | is.na(recycled[[2]])
@@ -154,7 +151,7 @@ hdg_sd <- function(hdg, weights = 1, na.rm = FALSE) {
   weights <- weights / max(weights, na.rm = na.rm)
 
   # need the mean as a unit vector
-  uv_mean <- uv_norm(tibble::as_tibble(lapply(uv * weights, sum)))
+  uv_mean <- uv_norm(lapply(uv * weights, sum))
 
   # ...to get the chord lengths
   uv_chord <- Map("-", uv, uv_mean)
@@ -172,9 +169,17 @@ hdg_sd <- function(hdg, weights = 1, na.rm = FALSE) {
 
 # internal for sanitizing
 as_uv <- function(uv) {
-  vctrs::vec_cast(uv, uv(double(), double()))
+  if (!is.list(uv)) {
+    stop(
+      sprintf(
+        "Can't convert `uv` (<%s>) to <list(u = double(), v = double()>)",
+        class(uv)[1]
+      )
+    )
+  }
+  uv(uv$u, uv$v)
 }
 
 as_hdg <- function(hdg) {
-  vctrs::vec_cast(hdg, double())
+  cast_double(hdg)
 }

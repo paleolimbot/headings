@@ -40,8 +40,6 @@ test_that("wmm2020_extract() warns for out-of-range lat/lon values", {
 })
 
 test_that("igrf13 defaults work", {
-  skip("IGRF not working yet")
-
   # taken from the test values distributed with IGRF13
   test_values <- read.table(
     "inst/extdata/IGRF13/sample_out_IGRF13.txt",
@@ -193,5 +191,3 @@ test_that("mm_ellipsoidal_height() works", {
 test_that("mm_version() works", {
   expect_match(mm_version(), "2019-12-10")
 })
-
-

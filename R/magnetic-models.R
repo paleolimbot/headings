@@ -39,10 +39,10 @@
 #'
 wmm2020_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                         height = mm_ellipsoidal_height(lon, lat, 0)) {
-  lon <- vctrs::vec_cast(lon, double())
-  lat <- vctrs::vec_cast(lat, double())
-  height <- vctrs::vec_cast(height, double())
-  year <- vctrs::vec_cast(year, double())
+  lon <- cast_double(lon, double())
+  lat <- cast_double(lat, double())
+  height <- cast_double(height, double())
+  year <- cast_double(year, double())
 
   mm_check_lon_lat(lon, lat)
 
@@ -50,7 +50,7 @@ wmm2020_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
     warning("`year` must be between 2020.0 and 2025.0", immediate. = TRUE)
   }
 
-  coords <- vctrs::vec_recycle_common(
+  coords <- recycle_common(
     lambda = lon,
     phi = lat,
     height = height,
@@ -58,17 +58,17 @@ wmm2020_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
   )
 
   coef <- cpp_mm_read_coef(system.file("extdata/WMM.COF", package = "headings"))
-  tibble::as_tibble(cpp_mm_extract(coef, coords))
+  new_data_frame(cpp_mm_extract(coef, coords))
 }
 
 #' @rdname wmm2020_extract
 #' @export
 igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                         height = mm_ellipsoidal_height(lon, lat, 0)) {
-  lon <- vctrs::vec_cast(lon, double())
-  lat <- vctrs::vec_cast(lat, double())
-  height <- vctrs::vec_cast(height, double())
-  year <- vctrs::vec_cast(year, double())
+  lon <- cast_double(lon)
+  lat <- cast_double(lat)
+  height <- cast_double(height)
+  year <- cast_double(year)
 
   mm_check_lon_lat(lon, lat)
 
@@ -76,11 +76,13 @@ igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
     warning("`year` must be between 1900.0 and 2025.0", immediate. = TRUE)
   }
 
-  coords <- tibble::tibble(
-    lambda = lon,
-    phi = lat,
-    height = height,
-    year = year
+  coords <- new_data_frame(
+    recycle_common(
+      lambda = lon,
+      phi = lat,
+      height = height,
+      year = year
+    )
   )
 
   # different coef file for each 5-year period
@@ -88,17 +90,20 @@ igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
   coef_year <- as.integer(pmin(2020, pmax(1900, year5)))
   coef_year_unique <- unique(coef_year)
 
-  output <- tibble::tibble(
-    decl = vctrs::vec_rep(NA_real_, length(coef_year)),
-    incl = vctrs::vec_rep(NA_real_, length(coef_year)),
-    decl_err = vctrs::vec_rep(NA_real_, length(coef_year)),
-    incl_err = vctrs::vec_rep(NA_real_, length(coef_year))
+  output <- new_data_frame(
+    list(
+      decl = rep(NA_real_, length(coef_year)),
+      incl = rep(NA_real_, length(coef_year)),
+      decl_err = rep(NA_real_, length(coef_year)),
+      incl_err = rep(NA_real_, length(coef_year))
+    )
   )
 
   for (coef_year_val in setdiff(coef_year_unique, NA_real_)) {
     coef <- igrf_coef_for_year(coef_year_val)
     indices <- which(coef_year == coef_year_val)
-    output[indices, ] <- cpp_mm_extract(coef, coords[indices, ])
+    output[indices, ] <-
+      cpp_mm_extract(coef, coords[indices, , drop = FALSE])
   }
 
   # no error model for IGRF, so NA these columns
@@ -121,10 +126,10 @@ igrf_coef_for_year <- function(coef_year) {
 #' @export
 emm2017_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                         height = mm_ellipsoidal_height(lon, lat, 0)) {
-  lon <- vctrs::vec_cast(lon, double())
-  lat <- vctrs::vec_cast(lat, double())
-  height <- vctrs::vec_cast(height, double())
-  year <- vctrs::vec_cast(year, double())
+  lon <- cast_double(lon, double())
+  lat <- cast_double(lat, double())
+  height <- cast_double(height, double())
+  year <- cast_double(year, double())
 
   mm_check_lon_lat(lon, lat)
 
@@ -132,21 +137,25 @@ emm2017_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
     warning("`year` must be between 2000.0 and 2022.0", immediate. = TRUE)
   }
 
-  coords <- tibble::tibble(
-    lambda = lon,
-    phi = lat,
-    height = height,
-    year = year
+  coords <- new_data_frame(
+    recycle_common(
+      lambda = lon,
+      phi = lat,
+      height = height,
+      year = year
+    )
   )
 
   coef_year <- as.integer(pmin(2017, pmax(2000, coords$year)))
   coef_year_unique <- unique(coef_year)
 
-  output <- tibble::tibble(
-    decl = vctrs::vec_rep(NA_real_, length(coef_year)),
-    incl = vctrs::vec_rep(NA_real_, length(coef_year)),
-    decl_err = vctrs::vec_rep(NA_real_, length(coef_year)),
-    incl_err = vctrs::vec_rep(NA_real_, length(coef_year))
+  output <- new_data_frame(
+    list(
+      decl = rep(NA_real_, length(coef_year)),
+      incl = rep(NA_real_, length(coef_year)),
+      decl_err = rep(NA_real_, length(coef_year)),
+      incl_err = rep(NA_real_, length(coef_year))
+    )
   )
 
   mutable_coef <- emm_coef_for_year(2017)
@@ -156,7 +165,8 @@ emm2017_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
     cpp_mm_coalesce_for_emm2017(mutable_coef, coef, coef_year_val != 2017)
 
     indices <- which(coef_year == coef_year_val)
-    output[indices, ] <- cpp_mm_extract(mutable_coef, coords[indices, ])
+    output[indices, ] <-
+      cpp_mm_extract(mutable_coef, coords[indices, , drop = FALSE])
   }
 
   # no error model for EMM, so NA these columns
@@ -184,13 +194,13 @@ emm_coef_for_year <- function(coef_year) {
 #' @rdname wmm2020_extract
 #' @export
 mm_ellipsoidal_height <- function(lon, lat, height) {
-  lon <- vctrs::vec_cast(lon, double())
-  lat <- vctrs::vec_cast(lat, double())
-  height <- vctrs::vec_cast(height, double())
+  lon <- cast_double(lon, double())
+  lat <- cast_double(lat, double())
+  height <- cast_double(height, double())
 
   mm_check_lon_lat(lon, lat)
 
-  coords <- vctrs::vec_recycle_common(
+  coords <- recycle_common(
     lambda = lon,
     phi = lat,
     height = height

@@ -7,10 +7,10 @@ test_that("hdg normalizing works", {
 })
 
 test_that("uv normalizing works", {
-  uv <- tibble::tibble(u = 0:1, v = 0:1)
+  uv <- uv(0:1, 0:1)
   expect_equal(
     uv_norm(uv),
-    tibble::tibble(u = c(NA, 1 / sqrt(2)), v = c(NA, 1 / sqrt(2)))
+    uv(c(NA, 1 / sqrt(2)), c(NA, 1 / sqrt(2)))
   )
 })
 
@@ -74,5 +74,5 @@ test_that("sanitizers work", {
   expect_identical(as_uv(uv(1, 2)), uv(1, 2))
   expect_error(as_uv(1), "Can't convert")
   expect_identical(as_hdg(1), 1)
-  expect_error(as_hdg("not a number"), "Can't convert")
+  expect_error(as_hdg("not a number"), "Can't cast")
 })
