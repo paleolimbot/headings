@@ -12,7 +12,9 @@ coverage](https://codecov.io/gh/paleolimbot/headings/branch/master/graph/badge.s
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-The goal of headings is to …
+The goal of headings is to provide well-tested functions for working
+with orientation data (headings), including aggregation (e.g., mean, sd)
+and correction (e.g., declination).
 
 ## Installation
 
@@ -26,7 +28,8 @@ devtools::install_github("paleolimbot/headings")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+The headings package can calculate a proper mean and standard deviation
+of compass headings:
 
 ``` r
 library(headings)
@@ -44,7 +47,7 @@ hdg_sd(c(350, 355, 360, 0, 5, 10))
 #> [1] 7.071068
 ```
 
-Practically, heading arithmetic can be used to summarize climate and/or
+For example, heading aggregation can be used to summarize climate and/or
 current directions over time.
 
 ``` r
@@ -83,4 +86,18 @@ kam %>%
 #> 10 10        13.7   7.52
 #> 11 11        11.0   5.25
 #> 12 12        17.5   9.60
+```
+
+Functions to correct for magnetic declination are also provided for the
+[IGRF13](https://www.ngdc.noaa.gov/IAGA/vmod/home.html),
+[WMM2020](https://www.ngdc.noaa.gov/geomag/EMM/index.html), and
+[EMM2017](https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml) models.
+
+``` r
+hdg_decl(-64, 45, year = 2021, model = "WMM2020")
+#> [1] -16.89051
+hdg_true_from_magnetic(13.40, -64, 45, year = 2021, model = "WMM2020")
+#> [1] 356.5095
+hdg_magnetic_from_true(356.51, -64, 45, year = 2021, model = "WMM2020")
+#> [1] 13.40051
 ```

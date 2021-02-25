@@ -174,6 +174,7 @@ hdg_sd <- function(hdg, weights = 1, na.rm = FALSE) {
 #'
 #' For more detailed output, see [wmm2020_extract()].
 #'
+#' @inheritParams hdg_norm
 #' @param model One of IGRF13, WMM2020, or EMM2017.
 #' @param height A height above the earth's surface (as approximated
 #'  by the EGM9615 geoid) in kilometers. If `height_ref` is

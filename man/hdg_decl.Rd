@@ -52,6 +52,11 @@ WGS84 ellipsoid.}
 \item{height_ref}{One of geoid or ellipsoid.}
 
 \item{model}{One of IGRF13, WMM2020, or EMM2017.}
+
+\item{hdg}{A heading in degrees, where 0 is north,
+90 is east, 180 is south, and 270 is west. Values
+outside the range [0-360) are coerced to this range
+using \code{\link[=hdg_norm]{hdg_norm()}}.}
 }
 \value{
 A declination, true heading, or magnetic heading.
