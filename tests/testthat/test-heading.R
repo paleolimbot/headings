@@ -70,6 +70,23 @@ test_that("weighted sd of headings works", {
   expect_false(hdg_sd(0:5, weights = c(10, 0, 0, 0, 0, 10)) == hdg_sd(0:5))
 })
 
+test_that("declination correction works", {
+  decl_igrf <- hdg_decl(-64, 45, year = 2020, model = "IGRF13")
+  decl_wmm <- hdg_decl(-64, 45, year = 2020, model = "WMM2020")
+  decl_emm <- hdg_decl(-64, 45, year = 2020, model = "EMM2017")
+  expect_true(all(0.2 > abs(-17.02 - c(decl_igrf, decl_wmm, decl_emm))))
+
+  expect_identical(
+    hdg_true_from_magnetic(0, -64, 45, year = 2020, model = "WMM2020"),
+    hdg_norm(decl_wmm)
+  )
+
+  expect_identical(
+    hdg_magnetic_from_true(0, -64, 45, year = 2020, model = "WMM2020"),
+    hdg_norm(-decl_wmm)
+  )
+})
+
 test_that("sanitizers work", {
   expect_identical(as_uv(uv(1, 2)), uv(1, 2))
   expect_error(as_uv(1), "Can't convert")

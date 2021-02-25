@@ -14,6 +14,9 @@
 #'
 #' @examples
 #' hdg_norm(-10:10)
+#' hdg_from_uv(uv(1, 0))
+#' uv_from_hdg(5:10)
+#' uv_norm(uv(2, 0))
 #'
 hdg_norm <- function(hdg) {
   hdg <- as_hdg(hdg)
@@ -165,6 +168,85 @@ hdg_sd <- function(hdg, weights = 1, na.rm = FALSE) {
     sum(weights * (angle_chord ^ 2)) /
       (((n_non_zero_weights - 1) * sum(weights)) / n_non_zero_weights)
   )
+}
+
+#' Calculate declination, true heading, and magnetic heading
+#'
+#' For more detailed output, see [wmm2020_extract()].
+#'
+#' @param model One of IGRF13, WMM2020, or EMM2017.
+#' @param height A height above the earth's surface (as approximated
+#'  by the EGM9615 geoid) in kilometers. If `height_ref` is
+#'  "ellipsoid", this is interpreted as the height above the
+#'  WGS84 ellipsoid.
+#' @param height_ref One of geoid or ellipsoid.
+#' @inheritParams wmm2020_extract
+#'
+#' @return A declination, true heading, or magnetic heading.
+#' @export
+#'
+#' @examples
+#' hdg_decl(-64, 45, year = 2021)
+#' hdg_true_from_magnetic(13.40, -64, 45, year = 2021)
+#' hdg_magnetic_from_true(356.51, -64, 45, year = 2021)
+#'
+hdg_decl <- function(lon, lat, year, height = 0,
+                     height_ref = c("geoid", "ellipsoid"),
+                     model = c("IGRF13", "WMM2020", "EMM2017")) {
+  model <- match.arg(model)
+  height_ref <- match.arg(height_ref)
+
+  if (height_ref == "geoid") {
+    height <- mm_ellipsoidal_height(lon, lat, height)
+  }
+
+  result <- switch(
+    model,
+    "IGRF13" = igrf13_extract(lon, lat, year = year, height = height),
+    "WMM2020" = wmm2020_extract(lon, lat, year = year, height = height),
+    "EMM2017" = emm2017_extract(lon, lat, year = year, height = height),
+    stop(sprintf("Unknown model: '%s'", model))
+  )
+
+  result$decl
+}
+
+#' @rdname hdg_decl
+#' @export
+hdg_true_from_magnetic <- function(hdg, lon, lat, year,
+                                   height = 0,
+                                   height_ref = c("geoid", "ellipsoid"),
+                                   model = c("IGRF13", "WMM2020", "EMM2017")) {
+  model <- match.arg(model)
+  height_ref <- match.arg(height_ref)
+
+  recycle_common(
+    hdg = as_hdg(hdg),
+    lon = cast_double(lon),
+    lat = cast_double(lat),
+    year = cast_double(year)
+  )
+
+  hdg_norm(hdg + hdg_decl(lon, lat, year, height, height_ref, model))
+}
+
+#' @rdname hdg_decl
+#' @export
+hdg_magnetic_from_true <- function(hdg, lon, lat, year,
+                                   height = 0,
+                                   height_ref = c("geoid", "ellipsoid"),
+                                   model = c("IGRF13", "WMM2020", "EMM2017")) {
+  model <- match.arg(model)
+  height_ref <- match.arg(height_ref)
+
+  recycle_common(
+    hdg = as_hdg(hdg),
+    lon = cast_double(lon),
+    lat = cast_double(lat),
+    year = cast_double(year)
+  )
+
+  hdg_norm(hdg - hdg_decl(lon, lat, year, height, height_ref, model))
 }
 
 # internal for sanitizing

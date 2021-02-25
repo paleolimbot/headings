@@ -41,5 +41,8 @@ Create and export headings
 }
 \examples{
 hdg_norm(-10:10)
+hdg_from_uv(uv(1, 0))
+uv_from_hdg(5:10)
+uv_norm(uv(2, 0))
 
 }
