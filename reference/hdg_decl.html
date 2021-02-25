@@ -178,6 +178,13 @@ WGS84 ellipsoid.</p></td>
       <th>model</th>
       <td><p>One of IGRF13, WMM2020, or EMM2017.</p></td>
     </tr>
+    <tr>
+      <th>hdg</th>
+      <td><p>A heading in degrees, where 0 is north,
+90 is east, 180 is south, and 270 is west. Values
+outside the range [0-360) are coerced to this range
+using <code><a href='hdg_norm.html'>hdg_norm()</a></code>.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
