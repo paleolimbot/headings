@@ -42,7 +42,7 @@ test_that("wmm2020_extract() warns for out-of-range lat/lon values", {
 test_that("igrf13 defaults work", {
   # taken from the test values distributed with IGRF13
   test_values <- read.table(
-    "inst/extdata/IGRF13/sample_out_IGRF13.txt",
+    system.file("extdata/IGRF13/sample_out_IGRF13.txt", package = "headings"),
     header = TRUE
   )
 
