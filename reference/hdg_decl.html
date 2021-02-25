@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create and export headings — hdg_norm • headings</title>
+<title>Calculate declination, true heading, and magnetic heading — hdg_decl • headings</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Create and export headings — hdg_norm" />
-<meta property="og:description" content="Create and export headings" />
+<meta property="og:title" content="Calculate declination, true heading, and magnetic heading — hdg_decl" />
+<meta property="og:description" content="For more detailed output, see wmm2020_extract()." />
 
 
 
@@ -108,66 +108,87 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create and export headings</h1>
+    <h1>Calculate declination, true heading, and magnetic heading</h1>
     <small class="dont-index">Source: <a href='https://github.com/paleolimbot/headings/blob/master/R/heading.R'><code>R/heading.R</code></a></small>
-    <div class="hidden name"><code>hdg_norm.Rd</code></div>
+    <div class="hidden name"><code>hdg_decl.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create and export headings</p>
+    <p>For more detailed output, see <code><a href='wmm2020_extract.html'>wmm2020_extract()</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>hdg_norm</span><span class='op'>(</span><span class='va'>hdg</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>hdg_decl</span><span class='op'>(</span>
+  <span class='va'>lon</span>,
+  <span class='va'>lat</span>,
+  <span class='va'>year</span>,
+  height <span class='op'>=</span> <span class='fl'>0</span>,
+  height_ref <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geoid"</span>, <span class='st'>"ellipsoid"</span><span class='op'>)</span>,
+  model <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"IGRF13"</span>, <span class='st'>"WMM2020"</span>, <span class='st'>"EMM2017"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>uv</span><span class='op'>(</span><span class='va'>u</span>, <span class='va'>v</span><span class='op'>)</span>
+<span class='fu'>hdg_true_from_magnetic</span><span class='op'>(</span>
+  <span class='va'>hdg</span>,
+  <span class='va'>lon</span>,
+  <span class='va'>lat</span>,
+  <span class='va'>year</span>,
+  height <span class='op'>=</span> <span class='fl'>0</span>,
+  height_ref <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geoid"</span>, <span class='st'>"ellipsoid"</span><span class='op'>)</span>,
+  model <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"IGRF13"</span>, <span class='st'>"WMM2020"</span>, <span class='st'>"EMM2017"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>uv_norm</span><span class='op'>(</span><span class='va'>uv</span><span class='op'>)</span>
-
-<span class='fu'>uv_from_hdg</span><span class='op'>(</span><span class='va'>hdg</span><span class='op'>)</span>
-
-<span class='fu'>hdg_from_uv</span><span class='op'>(</span><span class='va'>uv</span><span class='op'>)</span>
-
-<span class='fu'>rad_from_hdg</span><span class='op'>(</span><span class='va'>hdg</span><span class='op'>)</span>
-
-<span class='fu'>hdg_from_rad</span><span class='op'>(</span><span class='va'>rad</span><span class='op'>)</span></pre>
+<span class='fu'>hdg_magnetic_from_true</span><span class='op'>(</span>
+  <span class='va'>hdg</span>,
+  <span class='va'>lon</span>,
+  <span class='va'>lat</span>,
+  <span class='va'>year</span>,
+  height <span class='op'>=</span> <span class='fl'>0</span>,
+  height_ref <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"geoid"</span>, <span class='st'>"ellipsoid"</span><span class='op'>)</span>,
+  model <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"IGRF13"</span>, <span class='st'>"WMM2020"</span>, <span class='st'>"EMM2017"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>hdg</th>
-      <td><p>A heading in degrees, where 0 is north,
-90 is east, 180 is south, and 270 is west. Values
-outside the range [0-360) are coerced to this range
-using <code>hdg_norm()</code>.</p></td>
+      <th>lon</th>
+      <td><p>Vectors of coordinates.</p></td>
     </tr>
     <tr>
-      <th>uv, u, v</th>
-      <td><p>A data.frame with columns <code>u</code> (magnitude east)
-and <code>v</code> (magnitude north).</p></td>
+      <th>lat</th>
+      <td><p>Vectors of coordinates.</p></td>
     </tr>
     <tr>
-      <th>rad</th>
-      <td><p>An angle in radians such that a <code>hdg</code> of 90 is
-zero radians and a <code>hdg</code> of 0 is <code>pi / 2</code> radians.</p></td>
+      <th>year</th>
+      <td><p>A decimal year (e.g., 2020.2120). The World Magnetic Model
+is valid between 2020.0 and 2025.0; the Enhanced Magnetic Model
+is valid between 2000.0 and 2022.0.</p></td>
+    </tr>
+    <tr>
+      <th>height</th>
+      <td><p>A height above the earth's surface (as approximated
+by the EGM9615 geoid) in kilometers. If <code>height_ref</code> is
+"ellipsoid", this is interpreted as the height above the
+WGS84 ellipsoid.</p></td>
+    </tr>
+    <tr>
+      <th>height_ref</th>
+      <td><p>One of geoid or ellipsoid.</p></td>
+    </tr>
+    <tr>
+      <th>model</th>
+      <td><p>One of IGRF13, WMM2020, or EMM2017.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A declination, true heading, or magnetic heading.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>hdg_norm</span><span class='op'>(</span><span class='op'>-</span><span class='fl'>10</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] 350 351 352 353 354 355 356 357 358 359   0   1   2   3   4   5   6   7   8
-#&gt; [20]   9  10</div><div class='input'><span class='fu'>hdg_from_uv</span><span class='op'>(</span><span class='fu'>uv</span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 90</div><div class='input'><span class='fu'>uv_from_hdg</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;            u         v
-#&gt; 1 0.08715574 0.9961947
-#&gt; 2 0.10452846 0.9945219
-#&gt; 3 0.12186934 0.9925462
-#&gt; 4 0.13917310 0.9902681
-#&gt; 5 0.15643447 0.9876883
-#&gt; 6 0.17364818 0.9848078</div><div class='input'><span class='fu'>uv_norm</span><span class='op'>(</span><span class='fu'>uv</span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>0</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   u v
-#&gt; 1 1 0</div><div class='input'>
+    <pre class="examples"><div class='input'><span class='fu'>hdg_decl</span><span class='op'>(</span><span class='op'>-</span><span class='fl'>64</span>, <span class='fl'>45</span>, year <span class='op'>=</span> <span class='fl'>2021</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] -16.88586</div><div class='input'><span class='fu'>hdg_true_from_magnetic</span><span class='op'>(</span><span class='fl'>13.40</span>, <span class='op'>-</span><span class='fl'>64</span>, <span class='fl'>45</span>, year <span class='op'>=</span> <span class='fl'>2021</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 356.5141</div><div class='input'><span class='fu'>hdg_magnetic_from_true</span><span class='op'>(</span><span class='fl'>356.51</span>, <span class='op'>-</span><span class='fl'>64</span>, <span class='fl'>45</span>, year <span class='op'>=</span> <span class='fl'>2021</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 13.39586</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
