@@ -47,8 +47,22 @@ hdg_sd(c(350, 355, 360, 0, 5, 10))
 #> [1] 7.071068
 ```
 
-For example, heading aggregation can be used to summarize climate and/or
-current directions over time.
+Functions to correct for magnetic declination are also provided for the
+[IGRF13](https://www.ngdc.noaa.gov/IAGA/vmod/home.html),
+[WMM2020](https://www.ngdc.noaa.gov/geomag/EMM/index.html), and
+[EMM2017](https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml) models.
+
+``` r
+hdg_decl(-64, 45, year = 2021)
+#> [1] -16.88586
+hdg_true_from_magnetic(13.40, -64, 45, year = 2021)
+#> [1] 356.5141
+hdg_magnetic_from_true(356.51, -64, 45, year = 2021)
+#> [1] 13.39586
+```
+
+As an example, heading aggregation can be used to summarize climate
+and/or current directions over time.
 
 ``` r
 library(tidyverse)
@@ -88,16 +102,37 @@ kam %>%
 #> 12 12        17.5   9.60
 ```
 
-Functions to correct for magnetic declination are also provided for the
-[IGRF13](https://www.ngdc.noaa.gov/IAGA/vmod/home.html),
-[WMM2020](https://www.ngdc.noaa.gov/geomag/EMM/index.html), and
-[EMM2017](https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml) models.
+The headings package also comes with a circle-aware kernel density
+function for visualizing vectors of headings.
 
 ``` r
-hdg_decl(-64, 45, year = 2021)
-#> [1] -16.88586
-hdg_true_from_magnetic(13.40, -64, 45, year = 2021)
-#> [1] 356.5141
-hdg_magnetic_from_true(356.51, -64, 45, year = 2021)
-#> [1] 13.39586
+plot(
+  hdg_density(
+    kam$wind_dir, 
+    weights = kam$wind_spd, 
+    na.rm = TRUE
+  )
+)
 ```
+
+<img src="man/figures/README-density-base-1.png" width="100%" />
+
+To use in ggplot2, you will need to extract the values from the density
+output:
+
+``` r
+kam %>% 
+  group_by(month) %>% 
+  summarise(
+    broom::tidy(hdg_density(wind_dir, weights = wind_spd))
+  ) %>% 
+  ggplot(aes(x, y)) +
+  geom_line() +
+  coord_polar() +
+  scale_x_continuous(breaks = seq(0, 360, by = 90)) +
+  facet_wrap(vars(month)) +
+  theme_bw()
+#> `summarise()` regrouping output by 'month' (override with `.groups` argument)
+```
+
+<img src="man/figures/README-density-ggplot2-1.png" width="100%" />

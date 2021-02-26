@@ -52,7 +52,7 @@ hdg_density <- function(hdg, bw = 5,
     weights <- rep(1 / length(x), length(x))
   } else {
     weights <- rep_len(weights, length(x))
-    weights <- weights / sum(weights)
+    weights <- weights / sum(weights, na.rm = TRUE)
   }
 
   dens_x <- seq(0, 360 - (1 / 512), length.out = 512)
