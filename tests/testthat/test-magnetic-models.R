@@ -110,6 +110,7 @@ test_that("igrf13 defaults work", {
   test_values$incl <- test_values$I_deg +
     (test_values$incl_sign * test_values$I_min / 60)
 
+  # test against the supplied file
   extract <- igrf13_extract(
     lon = test_values$lon,
     lat = test_values$lat,
@@ -117,21 +118,50 @@ test_that("igrf13 defaults work", {
     height = test_values$height
   )
 
-  # # compare with oce, which uses the fortran code
-  # # only at altitude zero
-  # oce_extract <- oce::magneticField(
-  #   test_values$lon,
-  #   test_values$lat,
-  #   time = test_values$year
-  # )
-  # # dms output is only good to one dec place
-  # round(oce_extract$decl - test_values$decl, 1)
-  # round(oce_extract$incl - test_values$incl, 1)
-
   # the third value is at 6000 km and doesn't seem to align
-  # tolerance here I beleive is in percent (i.e., 3%)
-  expect_equal(extract$decl[-3], test_values$decl[-3], tolerance = 0.03)
-  expect_equal(extract$incl[-3], test_values$incl[-3], tolerance = 0.03)
+  # tolerance here I beleive is in percent (i.e., 0.03%)
+  expect_equal(extract$decl[-3], test_values$decl[-3], tolerance = 0.0003)
+  expect_equal(extract$incl[-3], test_values$incl[-3], tolerance = 0.005)
+
+  # compare with oce, which uses the fortran code only at altitude zero
+  long_term_coords <- expand.grid(
+    year = c(1905, 1945, 1995, 2025),
+    lon = c(-90, 0, 90),
+    lat = c(-45, 0, 45)
+  )
+
+  # oce_extract <- oce::magneticField(
+  #   long_term_coords$lon,
+  #   long_term_coords$lat,
+  #   time = long_term_coords$year
+  # )
+
+  # dput(round(oce_extract$declination, 3))
+  # dput(round(oce_extract$inclination, 3))
+  oce_extract_decl <- c(
+    23.421, 23.471, 22.342, 20.853, -27.231, -26.646, -22.814,
+    -21.5, -30.25, -39.443, -43.767, -40.749, 8.11, 9.191, 5.539,
+    2.34, -16.751, -13.616, -7.95, -3.814, -1.377, -2.949, -2.558,
+    -1.819, 4.502, 3.279, -0.529, -2.664, -14.871, -8.899, -2.94,
+    1.391, 5.381, 3.192, 2.888, 1.81
+  )
+  oce_extract_incl <- c(
+    -50.833, -48.646, -47.823, -47.668, -55.738, -59.83, -63.224,
+    -63.168, -71.468, -72.06, -73.548, -74.667, 13.057, 18.072, 20.183,
+    19.415, -12.044, -20.665, -27.675, -30.339, -20.156, -22.3, -20.704,
+    -17.314, 74.944, 75.145, 73.064, 70.918, 62.043, 61.561, 60.578,
+    60.504, 62.908, 64.373, 64.644, 66.392
+  )
+
+  extract0 <- igrf13_extract(
+    long_term_coords$lon,
+    long_term_coords$lat,
+    year = long_term_coords$year,
+    height = 0
+  )
+
+  expect_identical(round(extract0$decl, 3), oce_extract_decl)
+  expect_identical(round(extract0$incl, 3), oce_extract_incl)
 })
 
 test_that("emm2017_extract() defaults work", {

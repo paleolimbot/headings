@@ -100,10 +100,22 @@ igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
   )
 
   for (coef_year_val in setdiff(coef_year_unique, NA_real_)) {
-    coef <- igrf_coef_for_year(coef_year_val)
     indices <- which(coef_year == coef_year_val)
-    output[indices, ] <-
-      cpp_mm_extract(coef, coords[indices, , drop = FALSE])
+
+    if (coef_year_val == 2020) {
+      coef <- igrf_coef_for_year(coef_year_val)
+      output[indices, ] <-
+        cpp_mm_extract(coef, coords[indices, , drop = FALSE])
+    } else {
+      coef_mutable <- igrf_coef_for_year(coef_year_val)
+      coef1 <- igrf_coef_for_year(coef_year_val)
+      coef2 <- igrf_coef_for_year(coef_year_val + 5)
+      output[indices, ] <- cpp_mm_igrf13_extract(
+        coef_mutable,
+        coef1, coef2,
+        coords[indices, , drop = FALSE]
+      )
+    }
   }
 
   # no error model for IGRF, so NA these columns

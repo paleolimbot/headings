@@ -219,3 +219,94 @@ list cpp_mm_extract(SEXP model_sexp, list coords) {
     out.names() = {"decl", "incl", "decl_err", "incl_err"};
     return out;
 }
+
+// for IGRF13, the coefficients themselves are interpolated between
+// five-year periods
+void mm_igrf13_interpolated(MAGtype_MagneticModel* mutable_model,
+                                const MAGtype_MagneticModel* model1, 
+                                const MAGtype_MagneticModel* model2,
+                                double year) {
+    // a number between zero and one used for interpolating
+    double interp = (year - model1->epoch) / (model2->epoch - model1->epoch);
+
+    int index;
+    double g1, g2, h1, h2;
+    for(int n = 1; n <= model1->nMax; n++) {
+        for(int m = 0; m <= n; m++) {
+            index = (n * (n + 1) / 2 + m);
+            g1 = model1->Main_Field_Coeff_G[index];
+            g2 = model2->Main_Field_Coeff_G[index];
+            h1 = model1->Main_Field_Coeff_H[index];
+            h2 = model2->Main_Field_Coeff_H[index];
+            mutable_model->Main_Field_Coeff_G[index] = g1 + (g2 - g1) * interp; 
+            mutable_model->Main_Field_Coeff_H[index] = h1 + (h2 - h1) * interp;
+            mutable_model->Secular_Var_Coeff_G[index] = g1 + (g2 - g1) * interp; 
+            mutable_model->Secular_Var_Coeff_H[index] = h1 + (h2 - h1) * interp;
+        }
+    }
+
+    mutable_model->epoch = year;
+}
+
+[[cpp11::register]]
+list cpp_mm_igrf13_extract(SEXP mutable_model_sexp, SEXP model1_sexp, SEXP model2_sexp, 
+                           list coords) {
+    external_pointer<WMMMagneticModel> model = mutable_model_sexp;
+    external_pointer<WMMMagneticModel> model1 = model1_sexp;
+    external_pointer<WMMMagneticModel> model2 = model2_sexp;
+
+    doubles lambda = coords["lambda"];
+    doubles phi = coords["phi"];
+    doubles height = coords["height"];
+    doubles year = coords["year"];
+
+    if (model->model() == nullptr || model1->model() == nullptr || model2->model() == nullptr) {
+        stop("One of `model`, `model1`, or `model2` is nullptr");
+    }
+
+    R_xlen_t size = lambda.size();
+    writable::doubles decl(size);
+    writable::doubles incl(size);
+    writable::doubles decl_err(size);
+    writable::doubles incl_err(size);
+    
+    MAGtype_Ellipsoid ellipsoid;
+    MAGtype_CoordSpherical coord_spherical;
+    MAGtype_CoordGeodetic coord_geod;
+    coord_geod.HeightAboveGeoid = NA_REAL;
+    coord_geod.UseGeoid = 0;
+    MAGtype_Date user_date;
+    MAGtype_GeoMagneticElements elements;
+    MAGtype_Geoid geoid;
+
+    MAG_SetDefaults(&ellipsoid, &geoid);
+    // double make sure the geoid isn't getting used here
+    geoid.UseGeoid = 0;
+
+    for (R_xlen_t i = 0 ; i < size; i++) {
+        if (((i + 1) % 1000) == 0) {
+            check_user_interrupt();
+        }
+
+        coord_geod.lambda = lambda[i];
+        coord_geod.phi = phi[i];
+        coord_geod.HeightAboveEllipsoid = height[i];
+        user_date.DecimalYear = year[i];
+
+        MAG_GeodeticToSpherical(ellipsoid, coord_geod, &coord_spherical);
+        mm_igrf13_interpolated(
+            model->model(),
+            model1->model(), model2->model(), 
+            user_date.DecimalYear
+        );
+        MAG_Geomag(ellipsoid, coord_spherical, coord_geod, model->model(), &elements);
+        MAG_CalculateGridVariation(coord_geod, &elements);
+
+        decl[i] = elements.Decl;
+        incl[i] = elements.Incl;
+    }
+
+    writable::list out = {decl, incl};
+    out.names() = {"decl", "incl"};
+    return out;
+}

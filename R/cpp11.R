@@ -23,3 +23,7 @@ cpp_mm_ellipsoidal_height <- function(coords, geoid_ints) {
 cpp_mm_extract <- function(model_sexp, coords) {
   .Call(`_headings_cpp_mm_extract`, model_sexp, coords)
 }
+
+cpp_mm_igrf13_extract <- function(mutable_model_sexp, model1_sexp, model2_sexp, coords) {
+  .Call(`_headings_cpp_mm_igrf13_extract`, mutable_model_sexp, model1_sexp, model2_sexp, coords)
+}
