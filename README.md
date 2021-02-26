@@ -94,10 +94,10 @@ Functions to correct for magnetic declination are also provided for the
 [EMM2017](https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml) models.
 
 ``` r
-hdg_decl(-64, 45, year = 2021, model = "WMM2020")
-#> [1] -16.89051
-hdg_true_from_magnetic(13.40, -64, 45, year = 2021, model = "WMM2020")
-#> [1] 356.5095
-hdg_magnetic_from_true(356.51, -64, 45, year = 2021, model = "WMM2020")
-#> [1] 13.40051
+hdg_decl(-64, 45, year = 2021)
+#> [1] -16.88586
+hdg_true_from_magnetic(13.40, -64, 45, year = 2021)
+#> [1] 356.5141
+hdg_magnetic_from_true(356.51, -64, 45, year = 2021)
+#> [1] 13.39586
 ```
