@@ -137,12 +137,12 @@
 <span class="co">#&gt; 12 12        17.5   9.60</span></code></pre></div>
 <p>Functions to correct for magnetic declination are also provided for the <a href="https://www.ngdc.noaa.gov/IAGA/vmod/home.html">IGRF13</a>, <a href="https://www.ngdc.noaa.gov/geomag/EMM/index.html">WMM2020</a>, and <a href="https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml">EMM2017</a> models.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/hdg_decl.html">hdg_decl</a></span><span class="op">(</span><span class="op">-</span><span class="fl">64</span>, <span class="fl">45</span>, year <span class="op">=</span> <span class="fl">2021</span>, model <span class="op">=</span> <span class="st">"WMM2020"</span><span class="op">)</span>
-<span class="co">#&gt; [1] -16.89051</span>
-<span class="fu"><a href="reference/hdg_decl.html">hdg_true_from_magnetic</a></span><span class="op">(</span><span class="fl">13.40</span>, <span class="op">-</span><span class="fl">64</span>, <span class="fl">45</span>, year <span class="op">=</span> <span class="fl">2021</span>, model <span class="op">=</span> <span class="st">"WMM2020"</span><span class="op">)</span>
-<span class="co">#&gt; [1] 356.5095</span>
-<span class="fu"><a href="reference/hdg_decl.html">hdg_magnetic_from_true</a></span><span class="op">(</span><span class="fl">356.51</span>, <span class="op">-</span><span class="fl">64</span>, <span class="fl">45</span>, year <span class="op">=</span> <span class="fl">2021</span>, model <span class="op">=</span> <span class="st">"WMM2020"</span><span class="op">)</span>
-<span class="co">#&gt; [1] 13.40051</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="reference/hdg_decl.html">hdg_decl</a></span><span class="op">(</span><span class="op">-</span><span class="fl">64</span>, <span class="fl">45</span>, year <span class="op">=</span> <span class="fl">2021</span><span class="op">)</span>
+<span class="co">#&gt; [1] -16.88586</span>
+<span class="fu"><a href="reference/hdg_decl.html">hdg_true_from_magnetic</a></span><span class="op">(</span><span class="fl">13.40</span>, <span class="op">-</span><span class="fl">64</span>, <span class="fl">45</span>, year <span class="op">=</span> <span class="fl">2021</span><span class="op">)</span>
+<span class="co">#&gt; [1] 356.5141</span>
+<span class="fu"><a href="reference/hdg_decl.html">hdg_magnetic_from_true</a></span><span class="op">(</span><span class="fl">356.51</span>, <span class="op">-</span><span class="fl">64</span>, <span class="fl">45</span>, year <span class="op">=</span> <span class="fl">2021</span><span class="op">)</span>
+<span class="co">#&gt; [1] 13.39586</span></code></pre></div>
 </div>
 </div>
   </div>
