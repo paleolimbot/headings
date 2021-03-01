@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Heading arithmetic — hdg_mean • headings</title>
+<title>Use functions from the circular package — hdg_circular • headings</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,8 @@
 
 
 
-<meta property="og:title" content="Heading arithmetic — hdg_mean" />
-<meta property="og:description" content="These functions provide basic summary statistics for headings
-that are commonly used. For more advanced statistics on circular data,
-use hdg_circular() and the
-circular package." />
+<meta property="og:title" content="Use functions from the circular package — hdg_circular" />
+<meta property="og:description" content="Use functions from the circular package" />
 
 
 
@@ -111,23 +108,16 @@ circular package." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Heading arithmetic</h1>
-    <small class="dont-index">Source: <a href='https://github.com/paleolimbot/headings/blob/master/R/heading.R'><code>R/heading.R</code></a></small>
-    <div class="hidden name"><code>hdg_mean.Rd</code></div>
+    <h1>Use functions from the circular package</h1>
+    <small class="dont-index">Source: <a href='https://github.com/paleolimbot/headings/blob/master/R/circular.R'><code>R/circular.R</code></a></small>
+    <div class="hidden name"><code>hdg_circular.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>These functions provide basic summary statistics for headings
-that are commonly used. For more advanced statistics on circular data,
-use <code><a href='hdg_circular.html'>hdg_circular()</a></code> and the
-<a href='https://cran.r-project.org/package=circular'>circular package</a>.</p>
+    <p>Use functions from the circular package</p>
     </div>
 
-    <pre class="usage"><span class='fu'>hdg_mean</span><span class='op'>(</span><span class='va'>hdg</span>, weights <span class='op'>=</span> <span class='fl'>1</span>, na.rm <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
-<span class='fu'>hdg_diff</span><span class='op'>(</span><span class='va'>hdg</span>, <span class='va'>hdg_ref</span><span class='op'>)</span>
-
-<span class='fu'>hdg_sd</span><span class='op'>(</span><span class='va'>hdg</span>, weights <span class='op'>=</span> <span class='cn'>NULL</span>, na.rm <span class='op'>=</span> <span class='cn'>FALSE</span>, bootstrap_n <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>hdg_circular</span><span class='op'>(</span><span class='va'>hdg</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,39 +129,24 @@ use <code><a href='hdg_circular.html'>hdg_circular()</a></code> and the
 outside the range [0-360) are coerced to this range
 using <code><a href='hdg_norm.html'>hdg_norm()</a></code>.</p></td>
     </tr>
-    <tr>
-      <th>weights</th>
-      <td><p>Optional weights for each value. Note that for <code>hdg_sd()</code>
-this will trigger a bootstrap estimation as there is no clear way to
-apply a weighted standard deviation to circular data.</p></td>
-    </tr>
-    <tr>
-      <th>na.rm</th>
-      <td><p>Use <code>TRUE</code> to remove missing values</p></td>
-    </tr>
-    <tr>
-      <th>hdg_ref</th>
-      <td><p>A reference heading against which
-to compare <code>hdg</code>.</p></td>
-    </tr>
-    <tr>
-      <th>bootstrap_n</th>
-      <td><p>For weighted standard deviation, the number of bootstrap
-replicates.</p></td>
-    </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A <code><a href='https://rdrr.io/pkg/circular/man/circular.html'>circular::circular()</a></code> object.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>hdg_mean</span><span class='op'>(</span><span class='op'>-</span><span class='fl'>10</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0</div><div class='input'><span class='fu'>hdg_mean</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>350</span>, <span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0</div><div class='input'>
-<span class='fu'>hdg_diff</span><span class='op'>(</span><span class='fl'>350</span><span class='op'>:</span><span class='fl'>370</span>, <span class='fl'>0</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] -1.000000e+01 -9.000000e+00 -8.000000e+00 -7.000000e+00 -6.000000e+00
-#&gt;  [6] -5.000000e+00 -4.000000e+00 -3.000000e+00 -2.000000e+00 -1.000000e+00
-#&gt; [11] -1.403342e-14  1.000000e+00  2.000000e+00  3.000000e+00  4.000000e+00
-#&gt; [16]  5.000000e+00  6.000000e+00  7.000000e+00  8.000000e+00  9.000000e+00
-#&gt; [21]  1.000000e+01</div><div class='input'>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ns-load.html'>requireNamespace</a></span><span class='op'>(</span><span class='st'>"circular"</span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'>hdg_circular</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div><div class='output co'>#&gt; Circular Data: 
+#&gt; Type = angles 
+#&gt; Units = degrees 
+#&gt; Template = geographics 
+#&gt; Modulo = asis 
+#&gt; Zero = 1.570796 
+#&gt; Rotation = clock 
+#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Heading-aware kernel density — hdg_density" />
-<meta property="og:description" content="Heading-aware kernel density" />
+<meta property="og:description" content="Computes an approximate density useful for visualization. For proper
+circular densities, use hdg_circular() and circular::density.circular()." />
 
 
 
@@ -114,7 +115,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Heading-aware kernel density</p>
+    <p>Computes an approximate density useful for visualization. For proper
+circular densities, use <code><a href='hdg_circular.html'>hdg_circular()</a></code> and <code><a href='https://rdrr.io/pkg/circular/man/density.circular.html'>circular::density.circular()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>hdg_density</span><span class='op'>(</span>
@@ -125,6 +127,19 @@
   weights <span class='op'>=</span> <span class='cn'>NULL</span>,
   n <span class='op'>=</span> <span class='fl'>512</span>,
   na.rm <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for hdg_density</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, main <span class='op'>=</span> <span class='cn'>NULL</span>, xlab <span class='op'>=</span> <span class='cn'>NULL</span>, ylab <span class='op'>=</span> <span class='cn'>NULL</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>hdg_plot</span><span class='op'>(</span>
+  <span class='va'>hdg</span>,
+  density <span class='op'>=</span> <span class='fu'>hdg_density</span><span class='op'>(</span><span class='va'>hdg</span>, na.rm <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>,
+  main <span class='op'>=</span> <span class='cn'>NULL</span>,
+  xlab <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ylab <span class='op'>=</span> <span class='cn'>NULL</span>,
+  axes <span class='op'>=</span> <span class='cn'>TRUE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -178,7 +193,22 @@ obtain the smoothness you want.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>further arguments for (non-default) methods.</p></td>
+      <td><p>For <code>hdg_density()</code>, dots are unused; for <code>plot.hdg_density()</code>,
+dots are passed to <code><a href='https://rdrr.io/r/graphics/lines.html'>graphics::lines()</a></code>; for <code>hdg_plot()</code>, passed to
+<code><a href='https://rdrr.io/r/graphics/points.html'>graphics::points()</a></code></p></td>
+    </tr>
+    <tr>
+      <th>x</th>
+      <td><p>the data from which the estimate is to be computed.  For the
+    default method a numeric vector: long vectors are not supported.</p></td>
+    </tr>
+    <tr>
+      <th>main, xlab, ylab, axes</th>
+      <td><p>See <code><a href='https://rdrr.io/r/graphics/plot.default.html'>graphics::plot()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>density</th>
+      <td><p>A <code>hdg_density()</code> object.</p></td>
     </tr>
     </table>
 
@@ -188,17 +218,22 @@ obtain the smoothness you want.</p></td>
 "hdg_density".</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span>
-  <span class='fu'>hdg_density</span><span class='op'>(</span>
-    <span class='fu'><a href='hdg_norm.html'>hdg_norm</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1000</span>, mean <span class='op'>=</span> <span class='fl'>0</span>, sd <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='op'>)</span>
-<span class='op'>)</span>
-</div><div class='img'><img src='hdg_density-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span>
-  <span class='fu'>hdg_density</span><span class='op'>(</span>
-    <span class='fu'><a href='hdg_norm.html'>hdg_norm</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1000</span>, mean <span class='op'>=</span> <span class='fl'>180</span>, sd <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='op'>)</span>
-<span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>kamloops2016</span><span class='op'>$</span><span class='va'>wind_dir</span>, <span class='fl'>1000</span><span class='op'>)</span>
+<span class='fu'>hdg_density</span><span class='op'>(</span><span class='va'>x</span>, na.rm <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
+#&gt; Call:
+#&gt; 	hdg_density(hdg = x, na.rm = TRUE)
+#&gt; 
+#&gt; Data: x (512 obs.);	Bandwidth 'bw' = 5
+#&gt; 
+#&gt;        x             y           
+#&gt;  Min.   :  0   Min.   :0.000000  
+#&gt;  1st Qu.: 90   1st Qu.:0.000000  
+#&gt;  Median :180   Median :0.000000  
+#&gt;  Mean   :180   Mean   :0.002797  
+#&gt;  3rd Qu.:270   3rd Qu.:0.000000  
+#&gt;  Max.   :360   Max.   :0.046648  </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fu'>hdg_density</span><span class='op'>(</span><span class='va'>x</span>, na.rm <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='img'><img src='hdg_density-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>hdg_plot</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 </div><div class='img'><img src='hdg_density-2.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
