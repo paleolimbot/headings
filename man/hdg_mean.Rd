@@ -27,7 +27,7 @@ apply a weighted standard deviation to circular data.}
 \item{hdg_ref}{A reference heading against which
 to compare \code{hdg}.}
 
-\item{boostrap_n}{For weighted standard deviation, the number of bootstrap
+\item{bootstrap_n}{For weighted standard deviation, the number of bootstrap
 replicates.}
 }
 \description{

@@ -1,11 +1,19 @@
 
 #' Heading-aware kernel density
 #'
+#' Computes an approximate density useful for visualization. For proper
+#' circular densities, use [hdg_circular()] and [circular::density.circular()].
+#'
 #' @inheritParams hdg_norm
 #' @param bw The bandwidth of the smoothing kernel. Automatic methods
 #'   are not available, so you will have to set this value manually to
 #'   obtain the smoothness you want.
 #' @inheritParams stats::density
+#' @param density A [hdg_density()] object.
+#' @param main,xlab,ylab,axes See [graphics::plot()].
+#' @param ... For [hdg_density()], dots are unused; for `plot.hdg_density()`,
+#'   dots are passed to [graphics::lines()]; for `hdg_plot()`, passed to
+#'   [graphics::points()]
 #'
 #' @return An object identical to [stats::density()] but with class
 #'   "hdg_density".
@@ -13,17 +21,10 @@
 #' @export
 #'
 #' @examples
-#' plot(
-#'   hdg_density(
-#'     hdg_norm(rnorm(1000, mean = 0, sd = 20))
-#'   )
-#' )
-#'
-#' plot(
-#'   hdg_density(
-#'     hdg_norm(rnorm(1000, mean = 180, sd = 20))
-#'   )
-#' )
+#' x <- head(kamloops2016$wind_dir, 1000)
+#' hdg_density(x, na.rm = TRUE)
+#' plot(hdg_density(x, na.rm = TRUE))
+#' hdg_plot(x)
 #'
 hdg_density <- function(hdg, bw = 5,
                         kernel = c("gaussian", "epanechnikov", "rectangular",
@@ -82,6 +83,7 @@ hdg_density <- function(hdg, bw = 5,
   )
 }
 
+#' @rdname hdg_density
 #' @importFrom graphics plot
 #' @export
 plot.hdg_density <- function(x, main = NULL, xlab = NULL, ylab = NULL,
@@ -108,6 +110,7 @@ plot.hdg_density <- function(x, main = NULL, xlab = NULL, ylab = NULL,
     double(), double(),
     main = main, xlab = xlab, ylab = ylab,
     xlim = radius_rng, ylim = radius_rng,
+    axes = axes,
     asp = 1
   )
 
@@ -125,4 +128,20 @@ plot.hdg_density <- function(x, main = NULL, xlab = NULL, ylab = NULL,
   graphics::polygon(hdg_uv * radius, ...)
 
   invisible(x)
+}
+
+#' @rdname hdg_density
+#' @export
+hdg_plot <- function(hdg, density = hdg_density(hdg, na.rm = TRUE),
+                     main = NULL, xlab = NULL, ylab = NULL,
+                     axes = TRUE, ...) {
+  if (is.null(main)) {
+    main <- deparse(substitute(hdg))
+  }
+
+  graphics::plot(density, main = main, xlab = xlab, ylab = ylab, axes = axes)
+  density_scale <- max(density$y)
+  graphics::points(uv_from_hdg(hdg) * density_scale, ...)
+
+  invisible(hdg)
 }

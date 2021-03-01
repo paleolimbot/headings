@@ -92,7 +92,7 @@ hdg_from_rad <- function(rad) {
 #' @param weights Optional weights for each value. Note that for `hdg_sd()`
 #'   this will trigger a bootstrap estimation as there is no clear way to
 #'   apply a weighted standard deviation to circular data.
-#' @param boostrap_n For weighted standard deviation, the number of bootstrap
+#' @param bootstrap_n For weighted standard deviation, the number of bootstrap
 #'   replicates.
 #'
 #' @export
@@ -158,7 +158,7 @@ hdg_sd <- function(hdg, weights = NULL, na.rm = FALSE, bootstrap_n = 100) {
       double(1)
     )
 
-    median(sd_boot)
+    stats::median(sd_boot)
   } else if (na.rm) {
     hdg <- hdg[!is.na(hdg)]
     r_bar <- hdg_resultant(hdg)

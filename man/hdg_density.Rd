@@ -2,6 +2,8 @@
 % Please edit documentation in R/heading-density.R
 \name{hdg_density}
 \alias{hdg_density}
+\alias{plot.hdg_density}
+\alias{hdg_plot}
 \title{Heading-aware kernel density}
 \usage{
 hdg_density(
@@ -12,6 +14,18 @@ hdg_density(
   weights = NULL,
   n = 512,
   na.rm = FALSE,
+  ...
+)
+
+\method{plot}{hdg_density}(x, main = NULL, xlab = NULL, ylab = NULL, axes = TRUE, ...)
+
+hdg_plot(
+  hdg,
+  density = hdg_density(hdg, na.rm = TRUE),
+  main = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  axes = TRUE,
   ...
 )
 }
@@ -52,26 +66,29 @@ obtain the smoothness you want.}
 \item{na.rm}{logical; if \code{TRUE}, missing values are removed
     from \code{x}. If \code{FALSE} any missing values cause an error.}
 
-\item{...}{further arguments for (non-default) methods.}
+\item{...}{For \code{\link[=hdg_density]{hdg_density()}}, dots are unused; for \code{plot.hdg_density()},
+dots are passed to \code{\link[graphics:lines]{graphics::lines()}}; for \code{hdg_plot()}, passed to
+\code{\link[graphics:points]{graphics::points()}}}
+
+\item{x}{the data from which the estimate is to be computed.  For the
+    default method a numeric vector: long vectors are not supported.}
+
+\item{main, xlab, ylab, axes}{See \code{\link[graphics:plot.default]{graphics::plot()}}.}
+
+\item{density}{A \code{\link[=hdg_density]{hdg_density()}} object.}
 }
 \value{
 An object identical to \code{\link[stats:density]{stats::density()}} but with class
 "hdg_density".
 }
 \description{
-Heading-aware kernel density
+Computes an approximate density useful for visualization. For proper
+circular densities, use \code{\link[=hdg_circular]{hdg_circular()}} and \code{\link[circular:density.circular]{circular::density.circular()}}.
 }
 \examples{
-plot(
-  hdg_density(
-    hdg_norm(rnorm(1000, mean = 0, sd = 20))
-  )
-)
-
-plot(
-  hdg_density(
-    hdg_norm(rnorm(1000, mean = 180, sd = 20))
-  )
-)
+x <- head(kamloops2016$wind_dir, 1000)
+hdg_density(x, na.rm = TRUE)
+plot(hdg_density(x, na.rm = TRUE))
+hdg_plot(x)
 
 }

@@ -23,3 +23,7 @@ test_that("plot function for hdg_density() works", {
   dens_180 <- hdg_density(180, bw = 5)
   expect_identical(plot(dens_180), dens_180)
 })
+
+test_that("hdg_plot() works", {
+  expect_identical(hdg_plot(180), 180)
+})
