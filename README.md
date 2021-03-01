@@ -44,8 +44,13 @@ sd(c(350, 355, 360, 0, 5, 10))
 hdg_mean(c(350, 355, 360, 0, 5, 10))
 #> [1] 0
 hdg_sd(c(350, 355, 360, 0, 5, 10))
-#> [1] 7.071068
+#> [1] 6.458254
 ```
+
+For more statistical analyses of directions, you can use the [circular
+package](https://cran.r-project.org/package=circular). A convenience
+constructor `hdg_circular()` is provided to construct objects in the way
+that the circular package expects for compass headings.
 
 Functions to correct for magnetic declination are also provided for the
 [IGRF13](https://www.ngdc.noaa.gov/IAGA/vmod/home.html),
@@ -66,50 +71,45 @@ and/or current directions over time.
 
 ``` r
 library(tidyverse)
-library(weathercan)
+data("kamloops2016")
 
-# get some climate data
-kam <- weathercan::weather_dl(
-  station_ids = 51423,
-  start = "2016-01-01",
-  end = "2016-12-31"
-)
-#> As of weathercan v0.3.0 time display is either local time or UTC
-#> See Details under ?weather_dl for more information.
-#> This message is shown once per session
-
-kam %>% 
+kamloops2016 %>% 
+  as_tibble() %>%
+  filter(is.finite(wind_dir), is.finite(wind_spd)) %>% 
   group_by(month) %>% 
   summarise(
-    mean_wtd = hdg_mean(wind_dir, weights = wind_spd, na.rm = TRUE),
-    sd_wtd = hdg_sd(wind_dir, weights = wind_spd, na.rm = TRUE)
+    mean_wtd = hdg_mean(wind_dir, weights = wind_spd),
+    sd_wtd = hdg_sd(wind_dir, weights = wind_spd)
   )
 #> `summarise()` ungrouping output (override with `.groups` argument)
 #> # A tibble: 12 x 3
 #>    month mean_wtd sd_wtd
 #>    <chr>    <dbl>  <dbl>
-#>  1 01        13.5   7.80
-#>  2 02        11.9   6.04
-#>  3 03        15.0   8.09
-#>  4 04        18.1   9.01
-#>  5 05        20.5   8.87
-#>  6 06        16.8   8.38
-#>  7 07        18.4   8.72
-#>  8 08        21.8   8.29
-#>  9 09        18.6   9.47
-#> 10 10        13.7   7.52
-#> 11 11        11.0   5.25
-#> 12 12        17.5   9.60
+#>  1 01        13.5   7.79
+#>  2 02        11.9   6.00
+#>  3 03        15.0   8.07
+#>  4 04        18.1   8.97
+#>  5 05        20.5   8.86
+#>  6 06        16.8   8.34
+#>  7 07        18.4   8.70
+#>  8 08        21.8   8.32
+#>  9 09        18.6   9.43
+#> 10 10        13.7   7.44
+#> 11 11        11.0   5.26
+#> 12 12        17.5   9.59
 ```
 
 The headings package also comes with a circle-aware kernel density
-function for visualizing vectors of headings.
+estimator for visualizing vectors of headings. For circular kernel
+densities in a non-visualization context, use the [circular
+package](https://cran.r-project.org/package=circular)
+(`circular::density.circular()`).
 
 ``` r
 plot(
   hdg_density(
-    kam$wind_dir, 
-    weights = kam$wind_spd, 
+    kamloops2016$wind_dir, 
+    weights = kamloops2016$wind_spd, 
     na.rm = TRUE
   )
 )
@@ -121,7 +121,7 @@ To use in ggplot2, you will need to extract the values from the density
 output:
 
 ``` r
-kam %>% 
+kamloops2016 %>% 
   group_by(month) %>% 
   summarise(
     broom::tidy(hdg_density(wind_dir, weights = wind_spd))

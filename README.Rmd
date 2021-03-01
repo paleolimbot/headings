@@ -6,7 +6,7 @@ output: github_document
 
 ```{r, include = FALSE}
 library(tidyverse)
-library(weathercan)
+set.seed(39374)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -50,6 +50,8 @@ hdg_mean(c(350, 355, 360, 0, 5, 10))
 hdg_sd(c(350, 355, 360, 0, 5, 10))
 ```
 
+For more statistical analyses of directions, you can use the [circular package](https://cran.r-project.org/package=circular). A convenience constructor `hdg_circular()` is provided to construct objects in the way that the circular package expects for compass headings.
+
 Functions to correct for magnetic declination are also provided for the [IGRF13](https://www.ngdc.noaa.gov/IAGA/vmod/home.html), [WMM2020](https://www.ngdc.noaa.gov/geomag/EMM/index.html), and [EMM2017](https://www.ngdc.noaa.gov/geomag/WMM/DoDWMM.shtml) models.
 
 ```{r}
@@ -62,30 +64,25 @@ As an example, heading aggregation can be used to summarize climate and/or curre
 
 ```{r}
 library(tidyverse)
-library(weathercan)
+data("kamloops2016")
 
-# get some climate data
-kam <- weathercan::weather_dl(
-  station_ids = 51423,
-  start = "2016-01-01",
-  end = "2016-12-31"
-)
-
-kam %>% 
+kamloops2016 %>% 
+  as_tibble() %>%
+  filter(is.finite(wind_dir), is.finite(wind_spd)) %>% 
   group_by(month) %>% 
   summarise(
-    mean_wtd = hdg_mean(wind_dir, weights = wind_spd, na.rm = TRUE),
-    sd_wtd = hdg_sd(wind_dir, weights = wind_spd, na.rm = TRUE)
+    mean_wtd = hdg_mean(wind_dir, weights = wind_spd),
+    sd_wtd = hdg_sd(wind_dir, weights = wind_spd)
   )
 ```
 
-The headings package also comes with a circle-aware kernel density function for visualizing vectors of headings.
+The headings package also comes with a circle-aware kernel density estimator for visualizing vectors of headings. For circular kernel densities in a non-visualization context, use the [circular package](https://cran.r-project.org/package=circular) (`circular::density.circular()`).
 
 ```{r density-base}
 plot(
   hdg_density(
-    kam$wind_dir, 
-    weights = kam$wind_spd, 
+    kamloops2016$wind_dir, 
+    weights = kamloops2016$wind_spd, 
     na.rm = TRUE
   )
 )
@@ -94,7 +91,7 @@ plot(
 To use in ggplot2, you will need to extract the values from the density output:
 
 ```{r density-ggplot2}
-kam %>% 
+kamloops2016 %>% 
   group_by(month) %>% 
   summarise(
     broom::tidy(hdg_density(wind_dir, weights = wind_spd))
