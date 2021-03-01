@@ -10,7 +10,7 @@ hdg_mean(hdg, weights = 1, na.rm = FALSE)
 
 hdg_diff(hdg, hdg_ref)
 
-hdg_sd(hdg, weights = 1, na.rm = FALSE)
+hdg_sd(hdg, weights = NULL, na.rm = FALSE, bootstrap_n = 100)
 }
 \arguments{
 \item{hdg}{A heading in degrees, where 0 is north,
@@ -18,15 +18,23 @@ hdg_sd(hdg, weights = 1, na.rm = FALSE)
 outside the range [0-360) are coerced to this range
 using \code{\link[=hdg_norm]{hdg_norm()}}.}
 
-\item{weights}{Optional weights for each value}
+\item{weights}{Optional weights for each value. Note that for \code{hdg_sd()}
+this will trigger a bootstrap estimation as there is no clear way to
+apply a weighted standard deviation to circular data.}
 
 \item{na.rm}{Use \code{TRUE} to remove missing values}
 
 \item{hdg_ref}{A reference heading against which
 to compare \code{hdg}.}
+
+\item{boostrap_n}{For weighted standard deviation, the number of bootstrap
+replicates.}
 }
 \description{
-Heading arithmetic
+These functions provide basic summary statistics for headings
+that are commonly used. For more advanced statistics on circular data,
+use \code{\link[=hdg_circular]{hdg_circular()}} and the
+\href{https://cran.r-project.org/package=circular}{circular package}.
 }
 \examples{
 hdg_mean(-10:10)

@@ -51,7 +51,8 @@ test_that("mean and sd of hdgs works", {
   expect_equal(hdg_mean(0:10), 5)
   expect_equal(hdg_mean(-5:5), 0)
   expect_equal(hdg_mean(c(350, 10)), 0)
-  expect_equal(hdg_sd(-5:5), sd(0:10))
+  # sd.circular(circular(-5:5, units = "degrees")) * 180 / pi
+  expect_equal(round(hdg_sd(-5:5), 6), 3.162768)
 
   expect_identical(hdg_mean(c(1, 1, NA), na.rm = FALSE), NA_real_)
   expect_identical(hdg_mean(c(1, 1, NA), na.rm = TRUE), 1)
@@ -84,6 +85,28 @@ test_that("declination correction works", {
   expect_identical(
     hdg_magnetic_from_true(0, -64, 45, year = 2020, model = "WMM2020"),
     hdg_norm(-decl_wmm)
+  )
+})
+
+test_that("mean/sd matches circular package output", {
+  skip_if_not_installed("circular")
+
+  kam_hdg <- kamloops2016$wind_spd
+  kam_crc <- hdg_circular(kam_hdg)
+
+  expect_equal(
+    hdg_mean(kam_hdg, na.rm = TRUE),
+    as.numeric(mean(kam_crc, na.rm = TRUE))
+  )
+
+  expect_equal(
+    hdg_mean(kam_hdg, na.rm = TRUE),
+    as.numeric(mean(kam_crc, na.rm = TRUE))
+  )
+
+  expect_equal(
+    hdg_sd(kam_hdg, na.rm = TRUE),
+    circular::sd(kam_crc, na.rm = TRUE) * 180 / pi
   )
 })
 

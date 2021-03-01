@@ -80,11 +80,20 @@ hdg_from_rad <- function(rad) {
 
 #' Heading arithmetic
 #'
+#' These functions provide basic summary statistics for headings
+#' that are commonly used. For more advanced statistics on circular data,
+#' use [hdg_circular()] and the
+#' [circular package](https://cran.r-project.org/package=circular).
+#'
 #' @inheritParams hdg_norm
 #' @param hdg_ref A reference heading against which
 #'   to compare `hdg`.
 #' @param na.rm Use `TRUE` to remove missing values
-#' @param weights Optional weights for each value
+#' @param weights Optional weights for each value. Note that for `hdg_sd()`
+#'   this will trigger a bootstrap estimation as there is no clear way to
+#'   apply a weighted standard deviation to circular data.
+#' @param boostrap_n For weighted standard deviation, the number of bootstrap
+#'   replicates.
 #'
 #' @export
 #'
@@ -134,40 +143,37 @@ hdg_diff <- function(hdg, hdg_ref) {
 
 #' @rdname hdg_mean
 #' @export
-hdg_sd <- function(hdg, weights = 1, na.rm = FALSE) {
+hdg_sd <- function(hdg, weights = NULL, na.rm = FALSE, bootstrap_n = 100) {
   hdg <- as_hdg(hdg)
-  recycled <- recycle_common(hdg, weights)
 
-  if (na.rm) {
-    is_na <- is.na(recycled[[1]]) | is.na(recycled[[2]])
-    hdg <- recycled[[1]][!is_na]
-    weights <- recycled[[2]][!is_na]
+  if (!is.null(weights)) {
+    sd_boot <- vapply(
+      seq_len(bootstrap_n),
+      function(i) {
+        hdg_sd(
+          sample(hdg, bootstrap_n, replace = TRUE, prob = weights),
+          na.rm = na.rm
+        )
+      },
+      double(1)
+    )
+
+    median(sd_boot)
+  } else if (na.rm) {
+    hdg <- hdg[!is.na(hdg)]
+    r_bar <- hdg_resultant(hdg)
+    sqrt(-2 * log(r_bar)) * 180 / pi
   } else {
-    hdg <- recycled[[1]]
-    weights <- recycled[[2]]
+    r_bar <- hdg_resultant(hdg)
+    sqrt(-2 * log(r_bar)) * 180 / pi
   }
+}
 
-  # must be a unit vector
-  uv <- uv_from_hdg(hdg)
-
-  # similarly, weights must be 0...1
-  weights <- weights / max(weights, na.rm = na.rm)
-
-  # need the mean as a unit vector
-  uv_mean <- uv_norm(lapply(uv * weights, sum))
-
-  # ...to get the chord lengths
-  uv_chord <- Map("-", uv, uv_mean)
-  chord_len <- sqrt(uv_chord$u ^ 2 + uv_chord$v ^ 2)
-  angle_chord <- 2 * asin(chord_len / 2) * 180 / pi
-
-  n_non_zero_weights <- sum(weights != 0)
-
-  # scale angle_chord ^ 2 according to weights
-  sqrt(
-    sum(weights * (angle_chord ^ 2)) /
-      (((n_non_zero_weights - 1) * sum(weights)) / n_non_zero_weights)
-  )
+hdg_resultant <- function(hdg) {
+  x <- rad_from_hdg(as_hdg(hdg))
+  sin_r <- sum(sin(x))
+  cos_r <- sum(cos(x))
+  sqrt(sin_r ^ 2 + cos_r ^ 2) / length(x)
 }
 
 #' Calculate declination, true heading, and magnetic heading
