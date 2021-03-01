@@ -15,7 +15,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 3.0.0),
-    covr
+    covr,
+    circular
 Config/testthat/edition: 3
 URL: https://paleolimbot.github.io/headings/, https://github.com/paleolimbot/headings
 BugReports: https://github.com/paleolimbot/headings/issues

@@ -2,6 +2,7 @@
 
 S3method(plot,hdg_density)
 export(emm2017_extract)
+export(hdg_circular)
 export(hdg_decl)
 export(hdg_density)
 export(hdg_diff)
