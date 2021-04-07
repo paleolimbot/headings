@@ -41,12 +41,12 @@ std::string cpp_mm_version() {
 SEXP cpp_mm_read_coef(std::string filename_utf8) {
     // some peculiarities with the input...filename isn't modified and
     // the models array has a hard-to-replicate type
-    MAGtype_MagneticModel *models_sane[1];
+    MAGtype_MagneticModel* models_sane[1];
     models_sane[0] = nullptr;
 
     char* filename_buf = (char*) filename_utf8.c_str();
 
-    int result = MAG_robustReadMagModels(filename_buf, (MAGtype_MagneticModel *(*)[]) &models_sane, 1);
+    int result = MAG_robustReadMagModels(filename_buf, (MAGtype_MagneticModel**) models_sane, 1);
     if (result == 0) {
         if (models_sane[0] != nullptr) {
             MAG_FreeMagneticModelMemory(models_sane[0]);

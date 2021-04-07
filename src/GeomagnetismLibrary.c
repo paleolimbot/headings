@@ -303,7 +303,7 @@ int MAG_robustReadMagneticModel_Large(char *filename, char *filenameSV, MAGtype_
     return 1;
 } /*MAG_robustReadMagneticModel_Large*/
 
-int MAG_robustReadMagModels(char *filename, MAGtype_MagneticModel *(*magneticmodels)[], int array_size)
+int MAG_robustReadMagModels(char *filename, MAGtype_MagneticModel **magneticmodels, int array_size)
 {
     char line[MAXLINELENGTH];
     int n, nMax = 0, num_terms, a;
@@ -330,11 +330,11 @@ int MAG_robustReadMagModels(char *filename, MAGtype_MagneticModel *(*magneticmod
                 nMax = n;
         } while(n < 99999 && a == 1);
         num_terms = CALCULATE_NUMTERMS(nMax);
-        (*magneticmodels)[0] = MAG_AllocateModelMemory(num_terms);
-        (*magneticmodels)[0]->nMax = nMax;
-        (*magneticmodels)[0]->nMaxSecVar = nMax;
-        MAG_readMagneticModel(filename, (*magneticmodels)[0]);
-        (*magneticmodels)[0]->CoefficientFileEndDate = (*magneticmodels)[0]->epoch + 5;
+        magneticmodels[0] = MAG_AllocateModelMemory(num_terms);
+        magneticmodels[0]->nMax = nMax;
+        magneticmodels[0]->nMaxSecVar = nMax;
+        MAG_readMagneticModel(filename, magneticmodels[0]);
+        magneticmodels[0]->CoefficientFileEndDate = magneticmodels[0]->epoch + 5;
 
     } else return 0;
     fclose(MODELFILE);
@@ -981,7 +981,7 @@ int MAG_readMagneticModel_Large(char *filename, char *filenameSV, MAGtype_Magnet
     return TRUE;
 } /*MAG_readMagneticModel_Large*/
 
-int MAG_readMagneticModel_SHDF(char *filename, MAGtype_MagneticModel *(*magneticmodels)[], int array_size)
+int MAG_readMagneticModel_SHDF(char *filename, MAGtype_MagneticModel **magneticmodels, int array_size)
 /*
  * MAG_readMagneticModels - Read the Magnetic Models from an SHDF format file
  *
@@ -1060,7 +1060,7 @@ int MAG_readMagneticModel_SHDF(char *filename, MAGtype_MagneticModel *(*magnetic
             {
                 if(header_index > -1)
                 {
-                    MAG_AssignHeaderValues((*magneticmodels)[header_index], paramvalues);
+                    MAG_AssignHeaderValues(magneticmodels[header_index], paramvalues);
                 }
                 header_index++;
                 if(header_index >= array_size)
@@ -1087,7 +1087,7 @@ int MAG_readMagneticModel_SHDF(char *filename, MAGtype_MagneticModel *(*magnetic
                         if(tempint > 0 && allocationflag == 0)
                         {
                             numterms = CALCULATE_NUMTERMS(tempint);
-                            (*magneticmodels)[header_index] = MAG_AllocateModelMemory(numterms);
+                            magneticmodels[header_index] = MAG_AllocateModelMemory(numterms);
                             /* model = (*magneticmodels)[header_index]; */
                             allocationflag = 1;
                         }
@@ -1118,20 +1118,20 @@ int MAG_readMagneticModel_SHDF(char *filename, MAGtype_MagneticModel *(*magnetic
             if(m <= n)
             {
                 index = (n * (n + 1) / 2 + m);
-                (*magneticmodels)[header_index]->Main_Field_Coeff_G[index] = gnm;
-                (*magneticmodels)[header_index]->Secular_Var_Coeff_G[index] = dgnm;
-                (*magneticmodels)[header_index]->Main_Field_Coeff_H[index] = hnm;
-                (*magneticmodels)[header_index]->Secular_Var_Coeff_H[index] = dhnm;
+                magneticmodels[header_index]->Main_Field_Coeff_G[index] = gnm;
+                magneticmodels[header_index]->Secular_Var_Coeff_G[index] = dgnm;
+                magneticmodels[header_index]->Main_Field_Coeff_H[index] = hnm;
+                magneticmodels[header_index]->Secular_Var_Coeff_H[index] = dhnm;
             }
         }
     }
     if(header_index > -1)
-        MAG_AssignHeaderValues((*magneticmodels)[header_index], paramvalues);
+        MAG_AssignHeaderValues(magneticmodels[header_index], paramvalues);
     fclose(stream);
 
-    cutoff = (*magneticmodels)[array_size - 1]->CoefficientFileEndDate;
+    cutoff = magneticmodels[array_size - 1]->CoefficientFileEndDate;
 
-    for(i = 0; i < array_size; i++) (*magneticmodels)[i]->CoefficientFileEndDate = cutoff;
+    for(i = 0; i < array_size; i++) magneticmodels[i]->CoefficientFileEndDate = cutoff;
 
     free(ptrreset);
     line = NULL;
