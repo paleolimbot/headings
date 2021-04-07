@@ -1,7 +1,6 @@
 
 #include <cpp11.hpp>
 using namespace cpp11;
-namespace writable = cpp11::writable;
 
 #include <vector>
 
@@ -72,7 +71,7 @@ SEXP cpp_mm_read_coef_sv(std::string filename_utf8, std::string filename_sv_utf8
             MAG_FreeMagneticModelMemory(models_sane[0]);
         }
         stop(
-            "Failed to open model coefficients from '%s' or '%s'", 
+            "Failed to open model coefficients from '%s' or '%s'",
             filename_utf8.c_str(),
             filename_sv_utf8.c_str()
         );
@@ -91,7 +90,7 @@ void cpp_mm_coalesce_for_emm2017(SEXP mutable_model_sexp, SEXP model_sexp, bool 
 
     // assign coefficients from the epoch model against the "main" model (2017)
     MAG_AssignMagneticModelCoeffs(
-        mutable_model->model(), model->model(), 
+        mutable_model->model(), model->model(),
         model->model()->nMax, model->model()->nMaxSecVar
     );
 
@@ -143,8 +142,8 @@ doubles cpp_mm_ellipsoidal_height(list coords, integers geoid_ints) {
         coord_geod.HeightAboveGeoid = height[i];
 
         // MAG_ConvertGeoidToEllipsoidHeight() crashes with NAs
-        if (is_na(coord_geod.lambda) || 
-              is_na(coord_geod.phi) || 
+        if (is_na(coord_geod.lambda) ||
+              is_na(coord_geod.phi) ||
               is_na(coord_geod.HeightAboveGeoid)) {
             height_ellipsoid[i] = NA_REAL;
             continue;
@@ -178,7 +177,7 @@ list cpp_mm_extract(SEXP model_sexp, list coords) {
     writable::doubles incl(size);
     writable::doubles decl_err(size);
     writable::doubles incl_err(size);
-    
+
     MAGtype_Ellipsoid ellipsoid;
     MAGtype_CoordSpherical coord_spherical;
     MAGtype_CoordGeodetic coord_geod;
@@ -223,7 +222,7 @@ list cpp_mm_extract(SEXP model_sexp, list coords) {
 // for IGRF13, the coefficients themselves are interpolated between
 // five-year periods
 void mm_igrf13_interpolated(MAGtype_MagneticModel* mutable_model,
-                                const MAGtype_MagneticModel* model1, 
+                                const MAGtype_MagneticModel* model1,
                                 const MAGtype_MagneticModel* model2,
                                 double year) {
     // a number between zero and one used for interpolating
@@ -238,9 +237,9 @@ void mm_igrf13_interpolated(MAGtype_MagneticModel* mutable_model,
             g2 = model2->Main_Field_Coeff_G[index];
             h1 = model1->Main_Field_Coeff_H[index];
             h2 = model2->Main_Field_Coeff_H[index];
-            mutable_model->Main_Field_Coeff_G[index] = g1 + (g2 - g1) * interp; 
+            mutable_model->Main_Field_Coeff_G[index] = g1 + (g2 - g1) * interp;
             mutable_model->Main_Field_Coeff_H[index] = h1 + (h2 - h1) * interp;
-            mutable_model->Secular_Var_Coeff_G[index] = g1 + (g2 - g1) * interp; 
+            mutable_model->Secular_Var_Coeff_G[index] = g1 + (g2 - g1) * interp;
             mutable_model->Secular_Var_Coeff_H[index] = h1 + (h2 - h1) * interp;
         }
     }
@@ -249,7 +248,7 @@ void mm_igrf13_interpolated(MAGtype_MagneticModel* mutable_model,
 }
 
 [[cpp11::register]]
-list cpp_mm_igrf13_extract(SEXP mutable_model_sexp, SEXP model1_sexp, SEXP model2_sexp, 
+list cpp_mm_igrf13_extract(SEXP mutable_model_sexp, SEXP model1_sexp, SEXP model2_sexp,
                            list coords) {
     external_pointer<WMMMagneticModel> model = mutable_model_sexp;
     external_pointer<WMMMagneticModel> model1 = model1_sexp;
@@ -269,7 +268,7 @@ list cpp_mm_igrf13_extract(SEXP mutable_model_sexp, SEXP model1_sexp, SEXP model
     writable::doubles incl(size);
     writable::doubles decl_err(size);
     writable::doubles incl_err(size);
-    
+
     MAGtype_Ellipsoid ellipsoid;
     MAGtype_CoordSpherical coord_spherical;
     MAGtype_CoordGeodetic coord_geod;
@@ -296,7 +295,7 @@ list cpp_mm_igrf13_extract(SEXP mutable_model_sexp, SEXP model1_sexp, SEXP model
         MAG_GeodeticToSpherical(ellipsoid, coord_geod, &coord_spherical);
         mm_igrf13_interpolated(
             model->model(),
-            model1->model(), model2->model(), 
+            model1->model(), model2->model(),
             user_date.DecimalYear
         );
         MAG_Geomag(ellipsoid, coord_spherical, coord_geod, model->model(), &elements);
