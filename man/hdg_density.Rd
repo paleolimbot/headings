@@ -39,22 +39,22 @@ using \code{\link[=hdg_norm]{hdg_norm()}}.}
 are not available, so you will have to set this value manually to
 obtain the smoothness you want.}
 
-\item{kernel}{a character string giving the smoothing kernel
-    to be used. This must partially match one of \code{"gaussian"},
-    \code{"rectangular"}, \code{"triangular"}, \code{"epanechnikov"},
-    \code{"biweight"}, \code{"cosine"} or \code{"optcosine"}, with default
-    \code{"gaussian"}, and may be abbreviated to a unique prefix (single
-    letter).
-
-    \code{"cosine"} is smoother than \code{"optcosine"}, which is the
-    usual \sQuote{cosine} kernel in the literature and almost MSE-efficient.
-    However, \code{"cosine"} is the version used by S.
-  }
+\item{kernel}{A kernel algorithm to use}
 
 \item{weights}{numeric vector of non-negative observation weights,
     hence of same length as \code{x}. The default \code{NULL} is
     equivalent to \code{weights = rep(1/nx, nx)} where \code{nx} is the
-    length of (the finite entries of) \code{x[]}.}
+    length of (the finite entries of) \code{x[]}.  If \code{na.rm = TRUE}
+    and there are \code{NA}'s in \code{x}, they \emph{and} the
+    corresponding weights are removed before computations.  In that case,
+    when the original weights have summed to one, they are re-scaled to
+    keep doing so.
+
+    Note that weights are \emph{not} taken into account for automatic
+    bandwidth rules, i.e., when \code{bw} is a string.  When the weights
+    are proportional to true counts \code{cn}, \code{density(x = rep(x, cn))}
+    may be used instead of \code{weights}.
+  }
 
 \item{n}{the number of equally spaced points at which the density is
     to be estimated.  When \code{n > 512}, it is rounded up to a power

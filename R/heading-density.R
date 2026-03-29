@@ -10,6 +10,7 @@
 #'   obtain the smoothness you want.
 #' @inheritParams stats::density
 #' @param density A [hdg_density()] object.
+#' @param kernel A kernel algorithm to use
 #' @param main,xlab,ylab,axes See [graphics::plot()].
 #' @param ... For [hdg_density()], dots are unused; for `plot.hdg_density()`,
 #'   dots are passed to [graphics::lines()]; for `hdg_plot()`, passed to

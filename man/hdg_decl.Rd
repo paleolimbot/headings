@@ -36,9 +36,7 @@ hdg_magnetic_from_true(
 )
 }
 \arguments{
-\item{lon}{Vectors of coordinates.}
-
-\item{lat}{Vectors of coordinates.}
+\item{lon, lat}{Vectors of coordinates.}
 
 \item{year}{A decimal year (e.g., 2020.2120). The World Magnetic Model
 is valid between 2020.0 and 2025.0; the Enhanced Magnetic Model
