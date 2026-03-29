@@ -36,6 +36,7 @@
 #' wmm2025_extract(-64, 45, mm_decimal_year("2026-01-01"))
 #' wmm2020_extract(-64, 45, mm_decimal_year("2021-01-01"))
 #' emm2017_extract(-64, 45, mm_decimal_year("2021-01-01"))
+#' igrf14_extract(-64, 45, mm_decimal_year("2026-01-01"))
 #' igrf13_extract(-64, 45, mm_decimal_year("2021-01-01"))
 #'
 wmm2025_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
@@ -85,7 +86,6 @@ wmm_extract_internal <- function(lon, lat, year, height, coef_file,
     package = "headings"
   )
   coef <- cpp_mm_read_coef(coef_path)
-  browser()
   new_data_frame(cpp_mm_extract(coef, coords))
 }
 
@@ -123,8 +123,22 @@ igrf14_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
 
 #' @rdname wmm2025_extract
 #' @export
+igrf14_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
+                           height = mm_ellipsoidal_height(lon, lat, 0)) {
+  igrf_extract_internal(lon, lat, year, height, "IGRF14", 2025)
+}
+
+#' @rdname wmm2025_extract
+#' @export
 igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                            height = mm_ellipsoidal_height(lon, lat, 0)) {
+  igrf_extract_internal(lon, lat, year, height, "IGRF13", 2020)
+}
+
+#' @rdname wmm2025_extract
+#' @export
+igrf_extract_internal <- function(lon, lat, year, height, subdir,
+                                  last_model_year) {
   lon <- cast_double(lon)
   lat <- cast_double(lat)
   height <- cast_double(height)
@@ -132,8 +146,8 @@ igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
 
   mm_check_lon_lat(lon, lat)
 
-  if (any(year < 1900.0, na.rm = TRUE) || any(year > 2025.0, na.rm = TRUE)) {
-    warning("`year` must be between 1900.0 and 2025.0", immediate. = TRUE)
+  if (any(year < 1900.0, na.rm = TRUE) || any(year > last_model_year + 5, na.rm = TRUE)) {
+    warning(sprintf("`year` must be between 1900.0 and %s", last_model_year + 5))
   }
 
   coords <- new_data_frame(
@@ -162,14 +176,14 @@ igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
   for (coef_year_val in setdiff(coef_year_unique, NA_real_)) {
     indices <- which(coef_year == coef_year_val)
 
-    if (coef_year_val == 2020) {
-      coef <- igrf_coef_for_year(coef_year_val)
+    if (coef_year_val == last_model_year) {
+      coef <- igrf_coef_for_year(coef_year_val, subdir)
       output[indices, ] <-
         cpp_mm_extract(coef, coords[indices, , drop = FALSE])
     } else {
-      coef_mutable <- igrf_coef_for_year(coef_year_val)
-      coef1 <- igrf_coef_for_year(coef_year_val)
-      coef2 <- igrf_coef_for_year(coef_year_val + 5)
+      coef_mutable <- igrf_coef_for_year(coef_year_val, subdir)
+      coef1 <- igrf_coef_for_year(coef_year_val, subdir)
+      coef2 <- igrf_coef_for_year(coef_year_val + 5, subdir)
       output[indices, ] <- cpp_mm_igrf13_extract(
         coef_mutable,
         coef1, coef2,
@@ -185,9 +199,9 @@ igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
   output
 }
 
-igrf_coef_for_year <- function(coef_year) {
+igrf_coef_for_year <- function(coef_year, subdir) {
   coef_file <- system.file(
-    paste0("extdata/IGRF13/", coef_year, ".COF"),
+    paste0("extdata/", subdir, "/", coef_year, ".COF"),
     package = "headings"
   )
 

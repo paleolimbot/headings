@@ -4,7 +4,9 @@
 \name{wmm2025_extract}
 \alias{wmm2025_extract}
 \alias{wmm2020_extract}
+\alias{igrf14_extract}
 \alias{igrf13_extract}
+\alias{igrf_extract_internal}
 \alias{emm2017_extract}
 \alias{mm_ellipsoidal_height}
 \alias{mm_decimal_year}
@@ -29,12 +31,28 @@ wmm2020_extract(
   height = mm_ellipsoidal_height(lon, lat, 0)
 )
 
+igrf14_extract(
+  lon,
+  lat,
+  year = mm_decimal_year(Sys.Date()),
+  height = mm_ellipsoidal_height(lon, lat, 0)
+)
+
+igrf14_extract(
+  lon,
+  lat,
+  year = mm_decimal_year(Sys.Date()),
+  height = mm_ellipsoidal_height(lon, lat, 0)
+)
+
 igrf13_extract(
   lon,
   lat,
   year = mm_decimal_year(Sys.Date()),
   height = mm_ellipsoidal_height(lon, lat, 0)
 )
+
+igrf_extract_internal(lon, lat, year, height, subdir, last_model_year)
 
 emm2017_extract(
   lon,
