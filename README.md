@@ -5,11 +5,11 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/paleolimbot/headings/workflows/R-CMD-check/badge.svg)](https://github.com/paleolimbot/headings/actions)
-[![Codecov test
-coverage](https://codecov.io/gh/paleolimbot/headings/branch/master/graph/badge.svg)](https://codecov.io/gh/paleolimbot/headings?branch=master)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/paleolimbot/headings/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/paleolimbot/headings/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/paleolimbot/headings/graph/badge.svg)](https://app.codecov.io/gh/paleolimbot/headings)
 <!-- badges: end -->
 
 The goal of headings is to provide well-tested functions for working
@@ -73,16 +73,15 @@ and/or current directions over time.
 library(tidyverse)
 data("kamloops2016")
 
-kamloops2016 %>% 
+kamloops2016 %>%
   as_tibble() %>%
-  filter(is.finite(wind_dir), is.finite(wind_spd)) %>% 
-  group_by(month) %>% 
+  filter(is.finite(wind_dir), is.finite(wind_spd)) %>%
+  group_by(month) %>%
   summarise(
     mean_wtd = hdg_mean(wind_dir, weights = wind_spd),
     sd_wtd = hdg_sd(wind_dir, weights = wind_spd)
   )
-#> `summarise()` ungrouping output (override with `.groups` argument)
-#> # A tibble: 12 x 3
+#> # A tibble: 12 × 3
 #>    month mean_wtd sd_wtd
 #>    <chr>    <dbl>  <dbl>
 #>  1 01        13.5   7.79
@@ -108,8 +107,8 @@ package](https://cran.r-project.org/package=circular)
 ``` r
 plot(
   hdg_density(
-    kamloops2016$wind_dir, 
-    weights = kamloops2016$wind_spd, 
+    kamloops2016$wind_dir,
+    weights = kamloops2016$wind_spd,
     na.rm = TRUE
   )
 )
@@ -121,18 +120,17 @@ To use in ggplot2, you will need to extract the values from the density
 output:
 
 ``` r
-kamloops2016 %>% 
-  group_by(month) %>% 
-  summarise(
+kamloops2016 %>%
+  group_by(month) %>%
+  reframe(
     broom::tidy(hdg_density(wind_dir, weights = wind_spd))
-  ) %>% 
+  ) %>%
   ggplot(aes(x, y)) +
   geom_line() +
   coord_polar() +
   scale_x_continuous(breaks = seq(0, 360, by = 90)) +
   facet_wrap(vars(month)) +
   theme_bw()
-#> `summarise()` regrouping output by 'month' (override with `.groups` argument)
 ```
 
 <img src="man/figures/README-density-ggplot2-1.png" width="100%" />

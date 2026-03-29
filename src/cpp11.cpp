@@ -3,6 +3,7 @@
 
 
 #include "cpp11/declarations.hpp"
+#include <R_ext/Visibility.h>
 
 // magnetic-model.cpp
 std::string cpp_mm_version();
@@ -56,15 +57,6 @@ extern "C" SEXP _headings_cpp_mm_igrf13_extract(SEXP mutable_model_sexp, SEXP mo
 }
 
 extern "C" {
-/* .Call calls */
-extern SEXP _headings_cpp_mm_coalesce_for_emm2017(SEXP, SEXP, SEXP);
-extern SEXP _headings_cpp_mm_ellipsoidal_height(SEXP, SEXP);
-extern SEXP _headings_cpp_mm_extract(SEXP, SEXP);
-extern SEXP _headings_cpp_mm_igrf13_extract(SEXP, SEXP, SEXP, SEXP);
-extern SEXP _headings_cpp_mm_read_coef(SEXP);
-extern SEXP _headings_cpp_mm_read_coef_sv(SEXP, SEXP);
-extern SEXP _headings_cpp_mm_version();
-
 static const R_CallMethodDef CallEntries[] = {
     {"_headings_cpp_mm_coalesce_for_emm2017", (DL_FUNC) &_headings_cpp_mm_coalesce_for_emm2017, 3},
     {"_headings_cpp_mm_ellipsoidal_height",   (DL_FUNC) &_headings_cpp_mm_ellipsoidal_height,   2},
@@ -77,7 +69,7 @@ static const R_CallMethodDef CallEntries[] = {
 };
 }
 
-extern "C" void R_init_headings(DllInfo* dll){
+extern "C" attribute_visible void R_init_headings(DllInfo* dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);
