@@ -37,3 +37,6 @@ wmm_egm9615_geoid_dbl <- float_values %>%
 wmm_egm9615_geoid_int <- as.integer(wmm_egm9615_geoid_dbl * 1000)
 
 usethis::use_data(mm_egm9615_geoid_int, overwrite = TRUE)
+
+# 2025 model values downloaded from
+# https://www.ncei.noaa.gov/products/world-magnetic-model/wmm-coefficients

@@ -33,12 +33,25 @@
 #' NOAA, \doi{10.25923/ytk1-yx35}, 2020.
 #'
 #' @examples
+#' wmm2025_extract(-64, 45, mm_decimal_year("2026-01-01"))
 #' wmm2020_extract(-64, 45, mm_decimal_year("2021-01-01"))
 #' emm2017_extract(-64, 45, mm_decimal_year("2021-01-01"))
 #' igrf13_extract(-64, 45, mm_decimal_year("2021-01-01"))
 #'
+wmm2025_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
+                            height = mm_ellipsoidal_height(lon, lat, 0)) {
+  wmm_extract_internal(lon, lat, year, height, "WMM2025.COF", c(2025.0, 2030.0))
+}
+
+#' @rdname wmm2025_extract
+#' @export
 wmm2020_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
-                        height = mm_ellipsoidal_height(lon, lat, 0)) {
+                            height = mm_ellipsoidal_height(lon, lat, 0)) {
+  wmm_extract_internal(lon, lat, year, height, "WMM.COF", c(2020.0, 2025.0))
+}
+
+wmm_extract_internal <- function(lon, lat, year, height, coef_file,
+                                 valid_range) {
   lon <- cast_double(lon, double())
   lat <- cast_double(lat, double())
   height <- cast_double(height, double())
@@ -46,8 +59,18 @@ wmm2020_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
 
   mm_check_lon_lat(lon, lat)
 
-  if (any(year > 2025.0, na.rm = TRUE) || any(year < 2020.0, na.rm = TRUE)) {
-    warning("`year` must be between 2020.0 and 2025.0", immediate. = TRUE)
+  any_out_of_range <- any(year > valid_range[2], na.rm = TRUE) ||
+    any(year < valid_range[1], na.rm = TRUE)
+
+  if (any_out_of_range) {
+    warning(
+      sprintf(
+        "`year` must be between %s and %s for coefficients %s",
+        valid_range[1],
+        valid_range[2],
+        coef_file
+      )
+    )
   }
 
   coords <- recycle_common(
@@ -57,14 +80,18 @@ wmm2020_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
     year = year
   )
 
-  coef <- cpp_mm_read_coef(system.file("extdata/WMM.COF", package = "headings"))
+  coef_path <- system.file(
+    file.path("extdata", coef_file),
+    package = "headings"
+  )
+  coef <- cpp_mm_read_coef(coef_path)
   new_data_frame(cpp_mm_extract(coef, coords))
 }
 
-#' @rdname wmm2020_extract
+#' @rdname wmm2025_extract
 #' @export
 igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
-                        height = mm_ellipsoidal_height(lon, lat, 0)) {
+                           height = mm_ellipsoidal_height(lon, lat, 0)) {
   lon <- cast_double(lon)
   lat <- cast_double(lat)
   height <- cast_double(height)
@@ -134,7 +161,7 @@ igrf_coef_for_year <- function(coef_year) {
   cpp_mm_read_coef(coef_file)
 }
 
-#' @rdname wmm2020_extract
+#' @rdname wmm2025_extract
 #' @export
 emm2017_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                         height = mm_ellipsoidal_height(lon, lat, 0)) {
@@ -203,7 +230,7 @@ emm_coef_for_year <- function(coef_year) {
 }
 
 
-#' @rdname wmm2020_extract
+#' @rdname wmm2025_extract
 #' @export
 mm_ellipsoidal_height <- function(lon, lat, height) {
   lon <- cast_double(lon, double())
@@ -221,7 +248,7 @@ mm_ellipsoidal_height <- function(lon, lat, height) {
   cpp_mm_ellipsoidal_height(coords, headings::mm_egm9615_geoid_int)
 }
 
-#' @rdname wmm2020_extract
+#' @rdname wmm2025_extract
 #' @export
 mm_decimal_year <- function(date) {
   date <- as.Date(date)
@@ -229,13 +256,13 @@ mm_decimal_year <- function(date) {
   (date_lt$year + 1900) + date_lt$yday / 365
 }
 
-#' @rdname wmm2020_extract
+#' @rdname wmm2025_extract
 #' @export
 mm_version <- function() {
   cpp_mm_version()
 }
 
-#' @rdname wmm2020_extract
+#' @rdname wmm2025_extract
 "mm_egm9615_geoid_int"
 
 mm_check_lon_lat <- function(lon, lat) {

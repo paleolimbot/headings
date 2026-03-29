@@ -1,4 +1,30 @@
 
+test_that("wmm 2025 defaults work", {
+  # taken from the test values distributed with WMM2025
+  test_values <- read.table(
+    system.file("extdata/WMM2025_TestValues.txt", package = "headings"),
+    skip = 18,
+    header = FALSE
+  )
+
+  extract <- wmm2025_extract(
+    lon = test_values$V4,
+    lat = test_values$V3,
+    year = test_values$V1,
+    height = test_values$V2
+  )
+
+  expect_identical(
+    round(extract$decl, 2),
+    test_values$V5
+  )
+})
+
+test_that("wmm2020_extract() warns for out-of-range year values", {
+  expect_warning(wmm2025_extract(0, 0, year = 2024), "must be between")
+  expect_warning(wmm2025_extract(0, 0, year = 2030.1), "must be between")
+})
+
 test_that("wmm defaults work", {
   # taken from the test values distributed with WMM2020
   test_values <- read.table(
