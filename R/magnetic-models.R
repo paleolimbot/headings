@@ -135,8 +135,6 @@ igrf13_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
   igrf_extract_internal(lon, lat, year, height, "IGRF13", 2020)
 }
 
-#' @rdname wmm2025_extract
-#' @export
 igrf_extract_internal <- function(lon, lat, year, height, subdir,
                                   last_model_year) {
   lon <- cast_double(lon)
