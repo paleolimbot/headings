@@ -4,6 +4,7 @@
 \name{wmm2025_extract}
 \alias{wmm2025_extract}
 \alias{wmm2020_extract}
+\alias{igrf14_extract}
 \alias{igrf13_extract}
 \alias{emm2017_extract}
 \alias{mm_ellipsoidal_height}
@@ -23,6 +24,13 @@ wmm2025_extract(
 )
 
 wmm2020_extract(
+  lon,
+  lat,
+  year = mm_decimal_year(Sys.Date()),
+  height = mm_ellipsoidal_height(lon, lat, 0)
+)
+
+igrf14_extract(
   lon,
   lat,
   year = mm_decimal_year(Sys.Date()),
@@ -77,6 +85,7 @@ IGRF and NCEI World/Enhanced Magnetic Model Interface
 wmm2025_extract(-64, 45, mm_decimal_year("2026-01-01"))
 wmm2020_extract(-64, 45, mm_decimal_year("2021-01-01"))
 emm2017_extract(-64, 45, mm_decimal_year("2021-01-01"))
+igrf14_extract(-64, 45, mm_decimal_year("2026-01-01"))
 igrf13_extract(-64, 45, mm_decimal_year("2021-01-01"))
 
 }

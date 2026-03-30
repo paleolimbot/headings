@@ -190,6 +190,84 @@ test_that("igrf13 defaults work", {
   expect_identical(round(extract0$incl, 3), oce_extract_incl)
 })
 
+test_that("igrf14 model matches igrf13 model for overlapping coverage", {
+  # compare with IGRF13 for pre-1995 values (coefficients unchanged)
+  long_term_coords <- expand.grid(
+    year = seq(1900, 1995, by = 4),
+    lon = c(-90, 0, 90),
+    lat = c(-45, 0, 45)
+  )
+
+  extract0 <- igrf13_extract(
+    long_term_coords$lon,
+    long_term_coords$lat,
+    year = long_term_coords$year,
+    height = 0
+  )
+
+  extract1 <- igrf14_extract(
+    long_term_coords$lon,
+    long_term_coords$lat,
+    year = long_term_coords$year,
+    height = 0
+  )
+
+  expect_identical(extract1$decl, extract0$decl)
+  expect_identical(extract1$incl, extract0$incl)
+
+  # Check to make sure they are close for more recent values. They do not
+  # match exactly because the IGRF14 coefficients for 2000 onward have
+  # a degree of 13 but IGRF13 has a degree of 10.
+  recent_coords <- expand.grid(
+    year = seq(1995, 2025),
+    lon = c(-90, 0, 90),
+    lat = c(-45, 0, 45)
+  )
+
+  extract0 <- igrf13_extract(
+    recent_coords$lon,
+    recent_coords$lat,
+    year = recent_coords$year,
+    height = 0
+  )
+
+  extract1 <- igrf14_extract(
+    recent_coords$lon,
+    recent_coords$lat,
+    year = recent_coords$year,
+    height = 0
+  )
+
+  expect_equal(extract1$decl, extract0$decl, tolerance = 0.01)
+  expect_equal(extract1$incl, extract0$incl, tolerance = 0.01)
+})
+
+test_that("igrf14 model matches wmm model for 2025-2030 output", {
+  # compare with IGRF13 for pre-1995 values (coefficients unchanged)
+  coords <- expand.grid(
+    year = seq(2025, 2029.8, by = 0.1),
+    lon = c(-90, 0, 90),
+    lat = c(-45, 0, 45)
+  )
+
+  extract0 <- igrf14_extract(
+    coords$lon,
+    coords$lat,
+    year = coords$year,
+    height = 0
+  )
+
+  extract1 <- wmm2025_extract(
+    coords$lon,
+    coords$lat,
+    year = coords$year,
+    height = 0
+  )
+
+  expect_equal(extract1$decl, extract0$decl, tolerance = 0.01)
+  expect_equal(extract1$incl, extract0$incl, tolerance = 0.001)
+})
+
 test_that("emm2017_extract() defaults work", {
   # taken from the test values distributed with EMM2017
   test_values <- read.table(
