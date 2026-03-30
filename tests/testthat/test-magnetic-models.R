@@ -215,7 +215,9 @@ test_that("igrf14 model matches igrf13 model for overlapping coverage", {
   expect_identical(extract1$decl, extract0$decl)
   expect_identical(extract1$incl, extract0$incl)
 
-  # Check to make sure they are close for more recent values
+  # Check to make sure they are close for more recent values. They do not
+  # match exactly because the IGRF14 coefficients for 2000 onward have
+  # a degree of 13 but IGRF13 has a degree of 10.
   recent_coords <- expand.grid(
     year = seq(1995, 2025),
     lon = c(-90, 0, 90),

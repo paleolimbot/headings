@@ -37,13 +37,6 @@ igrf14_extract(
   height = mm_ellipsoidal_height(lon, lat, 0)
 )
 
-igrf14_extract(
-  lon,
-  lat,
-  year = mm_decimal_year(Sys.Date()),
-  height = mm_ellipsoidal_height(lon, lat, 0)
-)
-
 igrf13_extract(
   lon,
   lat,

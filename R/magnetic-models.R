@@ -93,38 +93,6 @@ wmm_extract_internal <- function(lon, lat, year, height, coef_file,
 #' @export
 igrf14_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
                            height = mm_ellipsoidal_height(lon, lat, 0)) {
-  lon <- cast_double(lon)
-  lat <- cast_double(lat)
-  height <- cast_double(height)
-  year <- cast_double(year)
-
-  mm_check_lon_lat(lon, lat)
-
-  if (any(year < 1900.0, na.rm = TRUE) || any(year > 2030.0, na.rm = TRUE)) {
-    warning("`year` must be between 1900.0 and 2030.0", immediate. = TRUE)
-  }
-
-  coords <- new_data_frame(
-    recycle_common(
-      lambda = lon,
-      phi = lat,
-      height = height,
-      year = year
-    )
-  )
-
-  coef_path <- system.file(
-    "extdata/IGRF14/igrf14coeffs.txt",
-    package = "headings"
-  )
-  coef <- cpp_mm_read_coef(coef_path)
-  new_data_frame(cpp_mm_extract(coef, coords))
-}
-
-#' @rdname wmm2025_extract
-#' @export
-igrf14_extract <- function(lon, lat, year = mm_decimal_year(Sys.Date()),
-                           height = mm_ellipsoidal_height(lon, lat, 0)) {
   igrf_extract_internal(lon, lat, year, height, "IGRF14", 2025)
 }
 
